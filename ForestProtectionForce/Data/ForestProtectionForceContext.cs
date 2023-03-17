@@ -13,6 +13,12 @@ public partial class ForestProtectionForceContext : DbContext
     }
 
     public virtual DbSet<Test> Tests { get; set; }
+    public virtual DbSet<UserType>  UserType { get; set; }
+    public virtual DbSet<Province> Province { get; set; }
+    public virtual DbSet<Circle> Circle { get; set; }
+    public virtual DbSet<District> District { get; set; }
+    public virtual DbSet<Division> Division { get; set; }
+    public virtual DbSet<Compartment> Compartment { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

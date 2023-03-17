@@ -1,6 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using ForestProtectionForce.Data;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 
 
@@ -20,10 +25,25 @@ builder.Services.AddDbContext<ForestProtectionForceContext>(
     });
 
 
-    
-   
+// Add CORS policy
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("corspolicy", builder =>
+    {
+        builder
+            .AllowAnyOrigin()
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
+
+
+
 
 var app = builder.Build();
+
+app.UseCors("corspolicy");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

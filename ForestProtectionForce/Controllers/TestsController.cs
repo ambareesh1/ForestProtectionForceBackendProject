@@ -23,9 +23,9 @@ namespace ForestProtectionForce.Controllers
 
         // GET: api/Tests
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Test>>> GetTests()
+        public async Task<ActionResult<IEnumerable<Province>>> GetTests()
         {
-            return await _context.Tests.ToListAsync();
+            return await _context.Province.ToListAsync();
         }
 
         // GET: api/Tests/5
