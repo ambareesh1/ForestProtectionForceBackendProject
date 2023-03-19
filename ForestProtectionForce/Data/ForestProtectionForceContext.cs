@@ -19,7 +19,8 @@ public partial class ForestProtectionForceContext : DbContext
     public virtual DbSet<District> District { get; set; }
     public virtual DbSet<Division> Division { get; set; }
     public virtual DbSet<Compartment> Compartment { get; set; }
-
+    public DbSet<Offender>? Offender { get; set; }
+    public DbSet<Baseline>? Baseline { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder
@@ -44,4 +45,6 @@ public partial class ForestProtectionForceContext : DbContext
     }
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
+
+   
 }

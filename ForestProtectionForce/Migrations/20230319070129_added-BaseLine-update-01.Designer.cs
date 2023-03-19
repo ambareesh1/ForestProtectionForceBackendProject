@@ -3,6 +3,7 @@ using System;
 using ForestProtectionForce.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ForestProtectionForce.Migrations
 {
     [DbContext(typeof(ForestProtectionForceContext))]
-    partial class ForestProtectionForceContextModelSnapshot : ModelSnapshot
+    [Migration("20230319070129_added-BaseLine-update-01")]
+    partial class addedBaseLineupdate01
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -92,9 +95,6 @@ namespace ForestProtectionForce.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<string>("SpeciesDetected")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Status")
                         .HasColumnType("longtext");
 
                     b.Property<string>("ToolsUsed")

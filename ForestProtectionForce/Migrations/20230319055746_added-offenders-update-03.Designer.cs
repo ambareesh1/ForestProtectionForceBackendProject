@@ -3,6 +3,7 @@ using System;
 using ForestProtectionForce.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ForestProtectionForce.Migrations
 {
     [DbContext(typeof(ForestProtectionForceContext))]
-    partial class ForestProtectionForceContextModelSnapshot : ModelSnapshot
+    [Migration("20230319055746_added-offenders-update-03")]
+    partial class addedoffendersupdate03
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,98 +24,6 @@ namespace ForestProtectionForce.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             MySqlModelBuilderExtensions.HasCharSet(modelBuilder, "utf8mb4");
-
-            modelBuilder.Entity("ForestProtectionForce.Models.Baseline", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<string>("CaseNo")
-                        .HasColumnType("longtext");
-
-                    b.Property<int>("CircleId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CircleName")
-                        .HasColumnType("longtext");
-
-                    b.Property<int>("CompartmentId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CompartmentName")
-                        .HasColumnType("longtext");
-
-                    b.Property<DateTime>("CrimeDate")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("CrimeDetails")
-                        .HasColumnType("longtext");
-
-                    b.Property<DateTime>("DateOfDetection")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("FIRNo")
-                        .HasColumnType("longtext");
-
-                    b.Property<int>("ForestDivisionId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ForestDivisionName")
-                        .HasColumnType("longtext");
-
-                    b.Property<int>("ForestRangeId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ForestRangeName")
-                        .HasColumnType("longtext");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<string>("ItemDescription")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("NameOfAccused")
-                        .HasColumnType("longtext");
-
-                    b.Property<int>("NoOfAccused")
-                        .HasColumnType("int");
-
-                    b.Property<string>("OfficerName")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("PoliceStation")
-                        .HasColumnType("longtext");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
-                    b.Property<string>("SectionOfLaw")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("SpeciesDetected")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Status")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("ToolsUsed")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("longtext");
-
-                    b.Property<DateTime>("UpdatedOn")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<float>("Weight")
-                        .HasColumnType("float");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Baseline");
-                });
 
             modelBuilder.Entity("ForestProtectionForce.Models.Circle", b =>
                 {
@@ -265,8 +176,8 @@ namespace ForestProtectionForce.Migrations
                         .HasColumnType("longtext")
                         .HasColumnName("Passport_No");
 
-                    b.Property<string>("Photo")
-                        .HasColumnType("longtext");
+                    b.Property<byte[]>("Photo")
+                        .HasColumnType("longblob");
 
                     b.Property<string>("PinCode")
                         .HasColumnType("longtext")

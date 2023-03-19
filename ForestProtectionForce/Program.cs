@@ -1,13 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using ForestProtectionForce.Data;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-
-
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -56,6 +49,13 @@ app.UseHttpsRedirection();
 app.UseAuthentication();;
 
 app.UseAuthorization();
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(
+        Path.Combine(Directory.GetCurrentDirectory(), "uploads")),
+    RequestPath = "/uploads"
+});
 
 app.MapControllers();
 
