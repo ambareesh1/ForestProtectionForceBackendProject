@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using ForestProtectionForce.Data;
 using ForestProtectionForce.Models;
 using ForestProtectionForce.Services;
+using Microsoft.Extensions.Options;
 
 namespace ForestProtectionForce.Controllers
 {
@@ -16,7 +17,7 @@ namespace ForestProtectionForce.Controllers
     public class BaselinesController : ControllerBase
     {
         private readonly ForestProtectionForceContext _context;
-
+     
         public BaselinesController(ForestProtectionForceContext context)
         {
             _context = context;
@@ -28,8 +29,9 @@ namespace ForestProtectionForce.Controllers
         {
           if (_context.Baseline == null)
           {
-              return NotFound();
+                return NotFound();
           }
+
             return await _context.Baseline.ToListAsync();
         }
 

@@ -1,6 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using ForestProtectionForce.Data;
 using Microsoft.Extensions.FileProviders;
+using ForestProtectionForce.Models;
+using Microsoft.AspNetCore.Identity;
+
+using ForestProtectionForce.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,9 +35,12 @@ builder.Services.AddCors(options =>
 });
 
 
-
-
-
+builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
+        .AddEntityFrameworkStores<ForestProtectionForceContext>()
+        .AddDefaultTokenProviders();
+builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+builder.Services.Configure<EmailConfiguration>(builder.Configuration.GetSection("EmailConfiguration"));
+builder.Services.AddScoped<IEmailService, EmailService>();
 var app = builder.Build();
 
 app.UseCors("corspolicy");
