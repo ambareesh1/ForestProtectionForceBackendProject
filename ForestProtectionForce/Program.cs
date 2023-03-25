@@ -42,9 +42,6 @@ builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnC
 builder.Services.Configure<EmailConfiguration>(builder.Configuration.GetSection("EmailConfiguration"));
 builder.Services.AddScoped<IEmailService, EmailService>();
 var app = builder.Build();
-
-app.UseCors("corspolicy");
-
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -53,17 +50,19 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseAuthentication();;
-
-app.UseAuthorization();
-
-app.UseStaticFiles(new StaticFileOptions
+app.UseStaticFiles();
+app.UseFileServer(new FileServerOptions
 {
     FileProvider = new PhysicalFileProvider(
-        Path.Combine(Directory.GetCurrentDirectory(), "uploads")),
-    RequestPath = "/uploads"
+           Path.Combine(builder.Environment.ContentRootPath, "uploads")),
+    RequestPath = "/uploads",
+    EnableDirectoryBrowsing = true
 });
 
+app.UseAuthentication();
+
+app.UseAuthorization();
+app.UseCors("corspolicy");
 app.MapControllers();
 
 app.Run();
