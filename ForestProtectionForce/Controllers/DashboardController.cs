@@ -44,7 +44,7 @@ namespace ForestProtectionForce.Controllers
             chartsList.AddRange(chartDatapie.ToList().DistinctBy(x => x.xaxis).AsQueryable());
 
             dashboard.charts = chartsList;
-            dashboard.baseline = _context.Baseline.ToList();
+            dashboard.baseline = _context.Baseline.Take(5).ToList();
             return Ok(dashboard);
         }
 

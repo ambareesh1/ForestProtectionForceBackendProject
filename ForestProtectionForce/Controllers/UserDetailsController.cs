@@ -3,6 +3,7 @@ using ForestProtectionForce.Models;
 using ForestProtectionForce.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using MySqlX.XDevAPI.Common;
 using Newtonsoft.Json.Linq;
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -182,6 +183,70 @@ namespace ForestProtectionForce.Controllers
             }
             return result;
         }
+
+        [HttpPost("forgotPassword")]
+        public async Task<ActionResult<UserDetails>> ForgotPassword([FromBody] object data)
+        {
+            if (data == null)
+            {
+                return Problem("Entity set 'ForestProtectionForceContext.UserDetails'  is null.");
+            }
+            JObject jsonData = JObject.Parse(data.ToString());
+            string? userName = jsonData["username"].ToString();
+            string email = jsonData["email"].ToString();
+            var result = await _context.UserDetails.FirstOrDefaultAsync(x => x.Username == userName && x.Email == email).ConfigureAwait(false);
+            if (result != null)
+            {
+                PasswordHashService passwordHashService = new(_context, _emailService);
+                string randomPassword = passwordHashService.GenerateRandomPassword();
+                result.Password = randomPassword;
+                passwordHashService.SendNewPasswordToUser(result);
+                return result;
+            }
+            return result;
+        }
+
+        [HttpPost("changePassword")]
+        public async Task<ActionResult<UserDetails>> ChangePassword([FromBody] object data)
+        {
+            if (data == null)
+            {
+                return Problem("Entity set 'ForestProtectionForceContext.UserDetails'  is null.");
+            }
+            JObject jsonData = JObject.Parse(data.ToString());
+            string? userName = jsonData["username"].ToString();
+            string password = jsonData["password"].ToString();
+            string? newpassword = jsonData["newpassword"].ToString();
+            var result = await _context.UserDetails.FirstOrDefaultAsync(x => x.Username == userName).ConfigureAwait(false);
+            PasswordHashService passwordHashService = new(_context, _emailService);
+            bool isAuthenticated = passwordHashService.VerifyPassword(result, password);
+            if (isAuthenticated)
+            {
+                result.Password = newpassword;
+                result.Password = await passwordHashService.GeneratePasswordAsync(result);
+
+                _context.Entry(result).State = EntityState.Modified;
+
+                try
+                {
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!UserDetailsExists(result.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return result;
+            }
+            return null;
+        }
+
 
         // DELETE: api/UserDetailss/5
         [HttpDelete("{id}")]
