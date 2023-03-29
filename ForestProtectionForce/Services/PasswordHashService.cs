@@ -22,7 +22,7 @@ namespace ForestProtectionForce.Services
             var user = new ApplicationUser
             {
                 UserName = userDetails.Username,
-                Email = userDetails.Email
+                Email = userDetails.Email,
             };
             var hasher = new PasswordHasher<ApplicationUser>();
             var PasswordHash = hasher.HashPassword(user, userDetails.Password);
@@ -44,7 +44,8 @@ namespace ForestProtectionForce.Services
             // verify the password
             var user = new ApplicationUser
             {
-                UserName = userDetails.Username
+                UserName = userDetails.Username 
+               
             };
             var result = hasher.VerifyHashedPassword(user, hashedPasswordFromDatabase, userInputPassword);
 

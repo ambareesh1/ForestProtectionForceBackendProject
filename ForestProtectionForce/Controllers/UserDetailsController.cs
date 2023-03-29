@@ -161,7 +161,7 @@ namespace ForestProtectionForce.Controllers
                 await passwordHashService.sendOtpAsync(result, otp);
                 return result; }
             }
-             return result; 
+             return null; 
         }
 
         [HttpPost("resendOtp")]
@@ -199,6 +199,25 @@ namespace ForestProtectionForce.Controllers
             {
                 PasswordHashService passwordHashService = new(_context, _emailService);
                 string randomPassword = passwordHashService.GenerateRandomPassword();
+                result.Password = randomPassword;
+                result.Password = await passwordHashService.GeneratePasswordAsync(result);
+                _context.Entry(result).State = EntityState.Modified;
+
+                try
+                {
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!UserDetailsExists(result.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
                 result.Password = randomPassword;
                 passwordHashService.SendNewPasswordToUser(result);
                 return result;
