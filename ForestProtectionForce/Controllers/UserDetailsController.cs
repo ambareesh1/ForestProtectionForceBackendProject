@@ -286,6 +286,22 @@ namespace ForestProtectionForce.Controllers
 
             return Ok();
         }
+        [HttpGet("verifyusername")]
+        public async Task<ActionResult<UserDetails>> VerifyUserName(string username)
+        {
+            if (_context.UserDetails == null)
+            {
+                return NotFound();
+            }
+            var userDetails = await _context.UserDetails.FirstOrDefaultAsync(x => x.Username == username);
+
+            if (userDetails == null)
+            {
+                return null;
+            }
+
+            return userDetails;
+        }
 
         private bool UserDetailsExists(int id)
         {

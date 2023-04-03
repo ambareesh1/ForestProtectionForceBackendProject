@@ -74,7 +74,7 @@ namespace ForestProtectionForce.Controllers
             return CreatedAtAction("GetUserTypes", new { id = userTypes.Id }, userTypes);
         }
      
-
+        
         // DELETE api/<UserTypesController>/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUserTypes(int id)

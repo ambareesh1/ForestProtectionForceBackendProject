@@ -23,7 +23,7 @@ public partial class ForestProtectionForceContext : DbContext
     public virtual DbSet<Offender>? Offender { get; set; }
     public virtual DbSet<Baseline>? Baseline { get; set; }
     public virtual DbSet<UserDetails>? UserDetails { get; set; }
-    //public virtual DbSet<ApplicationUser>? Users { get; set; }
+    public virtual DbSet<Superadmin>? Superadmin { get; set; }
     //public virtual DbSet<ApplicationRole>? Roles { get; set; }
     //public virtual DbSet<IdentityUserRole<string>>? UserRoles { get; set; }
 
