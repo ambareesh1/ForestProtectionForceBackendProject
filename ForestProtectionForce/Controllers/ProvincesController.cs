@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using ForestProtectionForce.Data;
+using ForestProtectionForce.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using ForestProtectionForce.Data;
-using ForestProtectionForce.Models;
 
 namespace ForestProtectionForce.Controllers
 {

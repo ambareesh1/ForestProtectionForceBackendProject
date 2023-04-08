@@ -60,6 +60,23 @@ namespace ForestProtectionForce.Controllers
             return userDetails;
         }
 
+        [HttpGet("GetUserDetailsByUserName{username}")]
+        public async Task<ActionResult<UserDetails>> GetUserDetailsByUserName(string userName)
+        {
+            if (_context.UserDetails == null)
+            {
+                return NotFound();
+            }
+            var userDetails = await _context.UserDetails.FirstOrDefaultAsync(x => x.Username == userName);
+
+            if (userDetails == null)
+            {
+                return NotFound();
+            }
+
+            return userDetails;
+        }
+
         // PUT: api/UserDetailss/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
@@ -152,16 +169,46 @@ namespace ForestProtectionForce.Controllers
             JObject jsonData = JObject.Parse(data.ToString());
             string? userPassword = jsonData["password"].ToString();
             string ? userName = jsonData["username"].ToString();
-            string otp = jsonData["otp"].ToString();
+            int otp = GenarateOtp();
             var result = await _context.UserDetails.FirstOrDefaultAsync(x=>x.Username == userName).ConfigureAwait(false);
             if (result != null ) { 
             PasswordHashService passwordHashService = new(_context, _emailService);
             bool isAuthenticated = passwordHashService.VerifyPassword(result, userPassword);
            if(isAuthenticated) {
+                await UpdateOtp(result.Id, otp, result);
                 await passwordHashService.sendOtpAsync(result, otp);
                 return result; }
             }
              return null; 
+        }
+
+        [HttpPut("updateOtp")]
+        public async Task<IActionResult> UpdateOtp(int id, int otp, UserDetails userDetails)
+        {
+            if (id != userDetails.Id)
+            {
+                return BadRequest();
+            }
+            userDetails.Otp = otp;
+            _context.Entry(userDetails).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!UserDetailsExists(userDetails.Id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
         }
 
         [HttpPost("resendOtp")]
@@ -173,11 +220,12 @@ namespace ForestProtectionForce.Controllers
             }
             JObject jsonData = JObject.Parse(data.ToString());
             string? userName = jsonData["username"].ToString();
-            string otp = jsonData["otp"].ToString();
+            int otp = GenarateOtp();
             var result = await _context.UserDetails.FirstOrDefaultAsync(x => x.Username == userName).ConfigureAwait(false);
             if (result != null)
             {
                 PasswordHashService passwordHashService = new(_context, _emailService);
+                await UpdateOtp(result.Id, otp, result);
                 await passwordHashService.sendOtpAsync(result, otp);
                 return result;
             }
@@ -236,7 +284,7 @@ namespace ForestProtectionForce.Controllers
             string? userName = jsonData["username"].ToString();
             string password = jsonData["password"].ToString();
             string? newpassword = jsonData["newpassword"].ToString();
-            var result = await _context.UserDetails.FirstOrDefaultAsync(x => x.Username == userName).ConfigureAwait(false);
+            var result = await _context.UserDetails.FirstOrDefaultAsync(x => x.Username == userName && password == password).ConfigureAwait(false);
             PasswordHashService passwordHashService = new(_context, _emailService);
             bool isAuthenticated = passwordHashService.VerifyPassword(result, password);
             if (isAuthenticated)
@@ -303,9 +351,50 @@ namespace ForestProtectionForce.Controllers
             return userDetails;
         }
 
+        [HttpGet("verifyemail")]
+        public async Task<ActionResult<UserDetails>> VerifyEmail(string email)
+        {
+            if (_context.UserDetails == null)
+            {
+                return NotFound();
+            }
+            var userDetails = await _context.UserDetails.FirstOrDefaultAsync(x => x.Email == email);
+
+            if (userDetails == null)
+            {
+                return null;
+            }
+
+            return userDetails;
+        }
+
+        [HttpGet("verifyphone")]
+        public async Task<ActionResult<UserDetails>> VerifyPhone(string phone)
+        {
+            if (_context.UserDetails == null)
+            {
+                return NotFound();
+            }
+            var userDetails = await _context.UserDetails.FirstOrDefaultAsync(x => x.Mobile == phone);
+
+            if (userDetails == null)
+            {
+                return null;
+            }
+
+            return userDetails;
+        }
+
         private bool UserDetailsExists(int id)
         {
             return (_context.UserTypes?.Any(e => e.Id == id)).GetValueOrDefault();
+        }
+
+        private int GenarateOtp()
+        {
+            Random random = new Random();
+            int otp = random.Next(1000, 10000);
+            return otp;
         }
     }
 }

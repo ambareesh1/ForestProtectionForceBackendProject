@@ -12,6 +12,7 @@
         public string? Ipaddress { get; set; }
         public DateTime LastupdatedOn { get; set; }
         public bool Isactive { get; set; }
+        public int Otp { get; set; }
     }
 
 }

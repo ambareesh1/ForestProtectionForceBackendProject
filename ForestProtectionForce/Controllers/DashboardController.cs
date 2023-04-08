@@ -31,10 +31,10 @@ namespace ForestProtectionForce.Controllers
     });
             var chartDataBar = _context.Baseline
                 .GroupBy(b => b.CrimeDate)
-                .Select(g => new Chart {name ="bar", xaxis = Convert.ToDateTime(g.Key).Year.ToString(), yaxis = g.Sum(b => b.CircleId).ToString() });
+                .Select(g => new Chart {name ="bar", xaxis = Convert.ToDateTime(g.Key).Year.ToString(), yaxis = g.Sum(b => b.Id).ToString() });
             var chartDatapie = _context.Baseline
-                .GroupBy(b => b.CircleName)
-                .Select(g => new Chart { name = "pie", xaxis = g.Key.ToString(), yaxis = g.Sum(b => b.CircleId).ToString() });
+                .GroupBy(b => b.ForestDivisionName)
+                .Select(g => new Chart { name = "pie", xaxis = g.Key.ToString(), yaxis = g.Sum(b => b.ForestDivisionId).ToString() });
 
             dashboard.boxModels = boxModalData;
 
