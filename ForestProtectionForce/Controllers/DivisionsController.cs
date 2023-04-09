@@ -39,6 +39,23 @@ namespace ForestProtectionForce.Controllers
             return divisionData;
         }
 
+        [HttpGet("GetDivisonByName")]
+        public async Task<ActionResult<Division>> GetDivisionByName(string name)
+        {
+            if (_context.Division == null)
+            {
+                return NotFound();
+            }
+            var division = await _context.Division.FirstOrDefaultAsync(x => x.Name == name);
+
+            if (division == null)
+            {
+                return NotFound();
+            }
+
+            return division;
+        }
+
         // GET: api/Divisions/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Division>> GetDivision(int id)

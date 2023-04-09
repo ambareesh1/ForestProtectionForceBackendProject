@@ -40,6 +40,22 @@ namespace ForestProtectionForce.Controllers
             return circleData;
 
         }
+        [HttpGet("GetCircleByName")]
+        public async Task<ActionResult<Circle>> GetCircleByName(string name)
+        {
+            if (_context.Circle == null)
+            {
+                return NotFound();
+            }
+            var circle = await _context.Circle.FirstOrDefaultAsync(x => x.Name == name);
+
+            if (circle == null)
+            {
+                return NotFound();
+            }
+
+            return circle;
+        }
 
         // GET: api/Circles/5
         [HttpGet("{id}")]

@@ -28,14 +28,14 @@ namespace ForestProtectionForce.Controllers
         }
 
         // GET: api/Provinces/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Province>> GetProvince(int id)
+        [HttpGet("GetProvinceByName")]
+        public async Task<ActionResult<Province>> GetProvinceByName(string name)
         {
           if (_context.Province == null)
           {
               return NotFound();
           }
-            var province = await _context.Province.FindAsync(id);
+            var province = await _context.Province.FirstOrDefaultAsync(x => x.Name == name);
 
             if (province == null)
             {

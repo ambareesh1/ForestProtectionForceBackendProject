@@ -41,6 +41,23 @@ namespace ForestProtectionForce.Controllers
             
         }
 
+        [HttpGet("GetDistrictByName")]
+        public async Task<ActionResult<District>> GetDistrictByName(string name)
+        {
+            if (_context.District == null)
+            {
+                return NotFound();
+            }
+            var district = await _context.District.FirstOrDefaultAsync(x => x.Name == name);
+
+            if (district == null)
+            {
+                return NotFound();
+            }
+
+            return district;
+        }
+
         // GET: api/Districts/5
         [HttpGet("{id}")]
         public async Task<ActionResult<District>> GetDistrict(int id)

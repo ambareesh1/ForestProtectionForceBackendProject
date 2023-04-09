@@ -39,6 +39,24 @@ namespace ForestProtectionForce.Controllers
             return compartmentData;
         }
 
+        [HttpGet("GetCompartmentByName")]
+        public async Task<ActionResult<Compartment>> GetCompartmentByName(string name)
+        {
+            if (_context.Compartment == null)
+            {
+                return NotFound();
+            }
+            var compartment = await _context.Compartment.FirstOrDefaultAsync(x => x.Name == name);
+
+            if (compartment == null)
+            {
+                return NotFound();
+            }
+
+            return compartment;
+        }
+
+
         // GET: api/Compartments/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Compartment>> GetCompartment(int id)
