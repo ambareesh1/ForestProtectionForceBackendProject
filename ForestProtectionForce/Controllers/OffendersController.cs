@@ -82,6 +82,28 @@ namespace ForestProtectionForce.Controllers
             return NoContent();
         }
 
+        [HttpPut("UpdateOffendersFromBaseLine")]
+        public async Task<IActionResult> UpdateOffendersFromBaseLine(string caseId, List<Offender> offenders)
+        {
+            foreach (var offender in offenders)
+            {
+                offender.CaseId = caseId;
+                _context.Entry(offender).State = EntityState.Modified;
+            }
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                // Handle concurrency exception
+            }
+
+            return NoContent();
+        }
+
+
         // POST: api/Offenders
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
