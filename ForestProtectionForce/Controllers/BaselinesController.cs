@@ -32,7 +32,7 @@ namespace ForestProtectionForce.Controllers
                 return NotFound();
           }
 
-            return await _context.Baseline.ToListAsync();
+            return await _context.Baseline.OrderByDescending(x => x.Id).ToListAsync();
         }
 
         // GET: api/Baselines/5

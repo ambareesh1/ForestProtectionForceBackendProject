@@ -30,7 +30,7 @@ namespace ForestProtectionForce.Controllers
           {
               return NotFound();
           }
-            return await _context.Offender.ToListAsync();
+            return await _context.Offender.OrderByDescending(x=>x.Id).ToListAsync();
         }
 
         // GET: api/Offenders/5
