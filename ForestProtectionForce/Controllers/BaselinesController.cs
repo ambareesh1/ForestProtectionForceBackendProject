@@ -9,6 +9,8 @@ using ForestProtectionForce.Data;
 using ForestProtectionForce.Models;
 using ForestProtectionForce.Services;
 using Microsoft.Extensions.Options;
+using ForestProtectionForce.utilities;
+using System.Linq.Expressions;
 
 namespace ForestProtectionForce.Controllers
 {
@@ -32,7 +34,11 @@ namespace ForestProtectionForce.Controllers
                 return NotFound();
           }
 
-            return await _context.Baseline.OrderByDescending(x => x.Id).ToListAsync();
+            string xUserData = HttpContext.Request.Headers["X-User-Data"];
+            var user = LogicConvertions.getUserDetails(xUserData ?? "");
+            var userDetails = _context.UserDetails?.FirstOrDefault(x => x.Username == user.username) ?? new UserDetails();
+            return await _context.Baseline.Where(predicateLogicForData(userDetails)).OrderByDescending(x => x.Id).ToListAsync();
+            //.Where(predicateLogicForData(userDetails))
         }
 
         // GET: api/Baselines/5
@@ -126,6 +132,22 @@ namespace ForestProtectionForce.Controllers
             return (_context.Baseline?.Any(e => e.Id == id)).GetValueOrDefault();
         }
 
+        [NonAction]
+        public Expression<Func<Baseline, bool>> predicateLogicForData(UserDetails userData)
+        {
+            Expression<Func<Baseline, bool>> condition = null;
+
+            if (userData.UserType_Id == 2 || userData.UserType_Id == 3 || userData.UserType_Id == 4)
+            {
+                condition = x => x.ForestDivisionId == userData.ProvinceId;
+            }
+            else
+            {
+                condition = x => true;
+            }
+
+            return condition;
+        }
 
     }
 }

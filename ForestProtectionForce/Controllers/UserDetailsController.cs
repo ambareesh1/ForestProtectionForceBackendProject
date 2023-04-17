@@ -1,10 +1,13 @@
 ﻿using ForestProtectionForce.Data;
 using ForestProtectionForce.Models;
 using ForestProtectionForce.Services;
+using ForestProtectionForce.utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MySqlX.XDevAPI.Common;
 using Newtonsoft.Json.Linq;
+using System.Linq;
+using System.Linq.Expressions;
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace ForestProtectionForce.Controllers
@@ -29,7 +32,10 @@ namespace ForestProtectionForce.Controllers
             {
                 return NotFound();
             }
-            return await _context.UserDetails.OrderByDescending(x=>x.Id).ToListAsync();
+            string xUserData = HttpContext.Request.Headers["X-User-Data"];
+            var user = LogicConvertions.getUserDetails(xUserData ?? "");
+            var userDetails = _context.UserDetails?.FirstOrDefault(x => x.Username == user.username) ?? new UserDetails();
+            return await _context.UserDetails.Where(predicateLogicForData(userDetails)).OrderByDescending(x=>x.Id).ToListAsync();
         }
 
         [HttpGet("userTypes")]
@@ -72,6 +78,23 @@ namespace ForestProtectionForce.Controllers
             if (userDetails == null)
             {
                 return NotFound();
+            }
+
+            return userDetails;
+        }
+
+        [HttpPost("VerifyUserAlreadyExistedWithSameDistrict")]
+        public async Task<ActionResult<UserDetails>> VerifyUserAlreadyExistedWithSameDistrict(UserDetails details)
+        {
+            if (_context.UserDetails == null)
+            {
+                return NotFound();
+            }
+            var userDetails = await _context.UserDetails.FirstOrDefaultAsync(x =>  x.Email == details.Email && x.UserType_Id == 4);
+
+            if (userDetails == null)
+            {
+                return null;
             }
 
             return userDetails;
@@ -383,6 +406,25 @@ namespace ForestProtectionForce.Controllers
             }
 
             return userDetails;
+        }
+
+        [NonAction]
+        public Expression<Func<UserDetails, bool>> predicateLogicForData(UserDetails userData)
+        {
+            Expression<Func<UserDetails, bool>> condition = null;
+
+            if(userData.UserType_Id == 2)
+            {
+                return condition = x => x.ProvinceId == userData.ProvinceId;
+            }
+            else if (userData.UserType_Id == 3 || userData.UserType_Id == 4 )
+            {
+                return condition = x => x.DistrictId == userData.DistrictId;
+            }
+            else
+            {
+                return condition = x => true;
+            }
         }
 
         private bool UserDetailsExists(int id)
