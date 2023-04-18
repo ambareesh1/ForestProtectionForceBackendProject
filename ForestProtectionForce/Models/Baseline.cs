@@ -7,6 +7,8 @@
         public string? OfficerName { get; set; }
         public string? CrimeDetails { get; set; }
         public string? ToolsUsed { get; set; }
+        public int ProvinceId { get; set; }
+        public string? ProvinceName { get; set; }
         public int CircleId { get; set; }
         public string? CircleName { get; set; }
         public string? ForestDivisionName { get; set; }
@@ -27,6 +29,7 @@
         public string? SpeciesDetected { get; set; }
         public string? ItemDescription { get; set; }
         public string? Status { get; set; }
+        public string? Reason { get; set; }
         public bool IsActive { get; set; }
         public DateTime UpdatedOn { get; set; }
         public string? UpdatedBy { get; set; }

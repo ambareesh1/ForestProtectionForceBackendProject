@@ -17,7 +17,7 @@ namespace ForestProtectionForce.Controllers
         public UserTypesController(ForestProtectionForceContext context)
         {
             _context = context;
-           
+
         }
 
 
@@ -29,6 +29,25 @@ namespace ForestProtectionForce.Controllers
                 return NotFound();
             }
             return await _context.UserTypes.ToListAsync();
+        }
+
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<UserTypes>> GetUserTypesById(int id)
+        {
+          
+            if (_context.UserTypes == null)
+            {
+                return NotFound();
+            }
+            var userTypes = await _context.UserTypes.FindAsync(id);
+
+            if (userTypes == null)
+            {
+                return NotFound();
+            }
+
+            return userTypes;
         }
 
         [HttpPut("{id}")]
