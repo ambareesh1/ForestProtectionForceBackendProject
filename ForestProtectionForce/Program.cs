@@ -52,14 +52,6 @@ if (app.Environment.IsDevelopment())
 //app.UseMiddleware<UserDataMiddleware>();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-app.UseFileServer(new FileServerOptions
-{
-    FileProvider = new PhysicalFileProvider(
-           Path.Combine(builder.Environment.ContentRootPath, "uploads")),
-    RequestPath = "/uploads",
-    EnableDirectoryBrowsing = true
-});
-
 app.UseAuthentication();
 
 app.UseAuthorization();

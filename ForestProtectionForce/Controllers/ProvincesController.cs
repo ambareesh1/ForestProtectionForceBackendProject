@@ -24,7 +24,24 @@ namespace ForestProtectionForce.Controllers
           {
               return NotFound();
           }
-            return await _context.Province.ToListAsync();
+            return await _context.Province.OrderByDescending(x=>x.Id).ToListAsync();
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Province>> GetProvinceById(int id)
+        {
+            if (_context.Province == null)
+            {
+                return NotFound();
+            }
+            var province = await _context.Province.FindAsync(id);
+
+            if (province == null)
+            {
+                return NotFound();
+            }
+
+            return province;
         }
 
         // GET: api/Provinces/5

@@ -8,7 +8,7 @@
         public string? Mobile { get; set; }
         public string? Email { get; set; }
         public string? AlternativeEmail { get; set; }
-        public string? Division { get; set; }
+        public int? Province { get; set; }
         public string? Ipaddress { get; set; }
         public DateTime LastupdatedOn { get; set; }
         public bool Isactive { get; set; }

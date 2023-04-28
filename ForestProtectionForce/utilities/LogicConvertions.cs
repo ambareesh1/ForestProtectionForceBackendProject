@@ -12,6 +12,20 @@ namespace ForestProtectionForce.utilities
             return user ?? new UserData();
         }
 
+        public static int getSuperAdminOfProvince(UserData userData)
+        {
+             if(userData.username == "superadmin_jammu")
+            {
+                return 1;
+            }else if (userData.username == "superadmin_kashmir")
+            {
+                return 2;
+            }
+            else
+            {
+                return 0;
+            }
+        }
 
     }
 }

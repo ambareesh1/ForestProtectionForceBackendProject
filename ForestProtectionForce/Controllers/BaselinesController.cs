@@ -36,8 +36,9 @@ namespace ForestProtectionForce.Controllers
 
             string xUserData = HttpContext.Request.Headers["X-User-Data"];
             var user = LogicConvertions.getUserDetails(xUserData ?? "");
+            int provinceOfSuperAdmins = LogicConvertions.getSuperAdminOfProvince(user);
             var userDetails = _context.UserDetails?.FirstOrDefault(x => x.Username == user.username) ?? new UserDetails();
-            return await _context.Baseline.Where(predicateLogicForData(userDetails)).OrderByDescending(x => x.Id).ToListAsync();
+            return await _context.Baseline.Where(predicateLogicForData(userDetails, provinceOfSuperAdmins)).OrderByDescending(x => x.Id).ToListAsync();
             //.Where(predicateLogicForData(userDetails))
         }
 
@@ -133,13 +134,20 @@ namespace ForestProtectionForce.Controllers
         }
 
         [NonAction]
-        public Expression<Func<Baseline, bool>> predicateLogicForData(UserDetails userData)
+        public Expression<Func<Baseline, bool>> predicateLogicForData(UserDetails userData, int provinceOfSuperAdmins)
         {
             Expression<Func<Baseline, bool>> condition = null;
-
-            if (userData.UserType_Id == 2 || userData.UserType_Id == 3 || userData.UserType_Id == 4)
+            if(userData.UserType_Id == 2)
             {
-                condition = x => x.ForestDivisionId == userData.ProvinceId;
+                condition = x => x.ProvinceId == userData.ProvinceId;
+            }
+            else if (userData.UserType_Id == 3 || userData.UserType_Id == 4)
+            {
+                condition = x => x.ForestDivisionId == userData.DistrictId;
+            }
+            else if (provinceOfSuperAdmins == 1 || provinceOfSuperAdmins == 2) //jammu or kashmir
+            {
+                condition = x => x.ProvinceId == provinceOfSuperAdmins;
             }
             else
             {

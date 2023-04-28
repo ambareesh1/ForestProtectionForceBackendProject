@@ -29,7 +29,7 @@ namespace ForestProtectionForce.Controllers
           {
               return NotFound();
           }
-            var divisionData = await _context.Division.ToListAsync();
+            var divisionData = await _context.Division.OrderByDescending(x => x.Id).ToListAsync();
 
             foreach (var division in divisionData)
             {

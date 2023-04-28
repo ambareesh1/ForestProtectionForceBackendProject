@@ -34,8 +34,9 @@ namespace ForestProtectionForce.Controllers
             }
             string xUserData = HttpContext.Request.Headers["X-User-Data"];
             var user = LogicConvertions.getUserDetails(xUserData ?? "");
+            int provinceOfSuperAdmins = LogicConvertions.getSuperAdminOfProvince(user);
             var userDetails = _context.UserDetails?.FirstOrDefault(x => x.Username == user.username) ?? new UserDetails();
-            return await _context.UserDetails.Where(predicateLogicForData(userDetails)).OrderByDescending(x=>x.Id).ToListAsync();
+            return await _context.UserDetails.Where(predicateLogicForData(userDetails, provinceOfSuperAdmins)).OrderByDescending(x=>x.Id).ToListAsync();
         }
 
         [HttpGet("userTypes")]
@@ -194,13 +195,24 @@ namespace ForestProtectionForce.Controllers
             string ? userName = jsonData["username"].ToString();
             int otp = GenarateOtp();
             var result = await _context.UserDetails.FirstOrDefaultAsync(x=>x.Username == userName).ConfigureAwait(false);
-            if (result != null ) { 
-            PasswordHashService passwordHashService = new(_context, _emailService);
-            bool isAuthenticated = passwordHashService.VerifyPassword(result, userPassword);
-           if(isAuthenticated) {
-                await UpdateOtp(result.Id, otp, result);
-                await passwordHashService.sendOtpAsync(result, otp);
-                return result; }
+          
+            if (result != null ) {
+                if (result.IsActive == true)
+                {
+                    PasswordHashService passwordHashService = new(_context, _emailService);
+                    bool isAuthenticated = passwordHashService.VerifyPassword(result, userPassword);
+                    if (isAuthenticated)
+                    {
+                        await UpdateOtp(result.Id, otp, result);
+                        await passwordHashService.sendOtpAsync(result, otp);
+                        return result;
+                    }
+                }
+                else
+                {
+                    return result;
+                }
+              
             }
              return null; 
         }
@@ -409,7 +421,7 @@ namespace ForestProtectionForce.Controllers
         }
 
         [NonAction]
-        public Expression<Func<UserDetails, bool>> predicateLogicForData(UserDetails userData)
+        public Expression<Func<UserDetails, bool>> predicateLogicForData(UserDetails userData, int provinceOfSuperAdmins)
         {
             Expression<Func<UserDetails, bool>> condition = null;
 
@@ -420,6 +432,10 @@ namespace ForestProtectionForce.Controllers
             else if (userData.UserType_Id == 3 || userData.UserType_Id == 4 )
             {
                 return condition = x => x.DistrictId == userData.DistrictId;
+            }
+            else if ( provinceOfSuperAdmins == 1 || provinceOfSuperAdmins == 2)
+            {
+                return condition = x => x.ProvinceId == provinceOfSuperAdmins;
             }
             else
             {

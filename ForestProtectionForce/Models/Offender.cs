@@ -34,7 +34,9 @@
         [Column("Date_of_Photography")]
         public DateTime? DateOfPhotography { get; set; }
 
-        public string? Photo { get; set; }
+        public byte[]? Photo { get; set; }
+
+        public string? Photo_Url { get; set; }
 
         [Column("Date_of_Birth")]
         public DateTime? DateOfBirth { get; set; }

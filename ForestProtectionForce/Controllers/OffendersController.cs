@@ -9,6 +9,14 @@ using ForestProtectionForce.Data;
 using ForestProtectionForce.Models;
 using System.Net.Http.Headers;
 using System.IO;
+using System.Drawing;
+using EllipticCurve.Utils;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
+using Image = SixLabors.ImageSharp.Image;
+using System.Linq.Expressions;
+using ForestProtectionForce.utilities;
+
 namespace ForestProtectionForce.Controllers
 {
     [Route("api/[controller]")]
@@ -31,7 +39,10 @@ namespace ForestProtectionForce.Controllers
           {
               return NotFound();
           }
-            return await _context.Offender.OrderByDescending(x=>x.Id).ToListAsync();
+            string xUserData = HttpContext.Request.Headers["X-User-Data"];
+            var user = LogicConvertions.getUserDetails(xUserData ?? "");
+            var userDetails = _context.UserDetails?.FirstOrDefault(x => x.Username == user.username) ?? new UserDetails();
+            return await _context.Offender.Where(predicateLogicForData(userDetails)).OrderByDescending(x=>x.Id).ToListAsync();
         }
 
         // GET: api/Offenders/5
@@ -78,7 +89,7 @@ namespace ForestProtectionForce.Controllers
             {
                 return BadRequest();
             }
-
+            offender.Photo_Url = ConvertAndStoreImage(offender);
             _context.Entry(offender).State = EntityState.Modified;
 
             try
@@ -158,6 +169,7 @@ namespace ForestProtectionForce.Controllers
           {
               return Problem("Entity set 'ForestProtectionForceContext.Offender'  is null.");
           }
+            offender.Photo_Url = ConvertAndStoreImage(offender);
             _context.Offender.Add(offender);
             await _context.SaveChangesAsync();
 
@@ -190,47 +202,69 @@ namespace ForestProtectionForce.Controllers
         }
 
         [HttpPost("upload"), DisableRequestSizeLimit]
-        public async Task<IActionResult> UploadAsync()
+        public async Task<ActionResult<Images>> UploadImage(IFormFile file)
         {
-            try
+            byte[] imageBytes;
+
+            using (var ms = new MemoryStream())
             {
+                await file.CopyToAsync(ms);
+                imageBytes = ms.ToArray();
+            }
 
-          
-            var file = Request.Form.Files[0];
-
-            if (file.Length > 0)
+            var image = new Images
             {
-                // Get the file name and extension
-                var fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
-              
-                var fileExtension = Path.GetExtension(fileName);
+                data = imageBytes
+            };
 
-                // Generate a unique file name to avoid conflicts
-                var newFileName = $"{Path.GetFileNameWithoutExtension(fileName)}{fileExtension}";
+            _context.Images?.Add(image);
+            await _context.SaveChangesAsync();
 
-                // Save the file to disk 
-                var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Uploads", newFileName);
-                using var stream = new FileStream(filePath, FileMode.Create);
-                await file.CopyToAsync(stream);
-
-                // Return the file URL
-                return Ok(new { url = filePath });
-            }
-            }
-            catch (Exception ex)
-            {
-                string fileName = "example.txt"; // specify the file name
-                string content = ex.ToString(); // specify the content of the text file
-
-                string filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Uploads", fileName); // get the file path
-
-                using (StreamWriter writer = new StreamWriter(filePath))
-                {
-                    writer.Write(content); // write the content to the file
-                }
-            }
-            return BadRequest("No file uploaded.");
+            return image; 
         }
+
+        //[HttpPost("upload"), DisableRequestSizeLimit]
+        //public async Task<IActionResult> UploadAsync()
+        //{
+        //    try
+        //    {
+
+
+        //    var file = Request.Form.Files[0];
+
+        //    if (file.Length > 0)
+        //    {
+        //        // Get the file name and extension
+        //        var fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
+
+        //        var fileExtension = Path.GetExtension(fileName);
+
+        //        // Generate a unique file name to avoid conflicts
+        //        var newFileName = $"{Path.GetFileNameWithoutExtension(fileName)}{fileExtension}";
+
+        //        // Save the file to disk 
+        //        var filePath = Path.Combine(_env.WebRootPath, "Uploads", newFileName);
+        //        using var stream = new FileStream(filePath, FileMode.Create);
+        //        await file.CopyToAsync(stream);
+
+        //        // Return the file URL
+        //        return Ok(new { url = filePath });
+        //    }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        string fileName = "example.txt"; // specify the file name
+        //        string content = ex.ToString(); // specify the content of the text file
+
+        //        string filePath = Path.Combine(_env.WebRootPath, "wwwroot", "Uploads", fileName); // get the file path
+
+        //        using (StreamWriter writer = new StreamWriter(filePath))
+        //        {
+        //            writer.Write(content); // write the content to the file
+        //        }
+        //    }
+        //    return BadRequest("No file uploaded.");
+        //}
         [NonAction]
         public  string getDistinctCaseIds(string input)
         {
@@ -271,6 +305,56 @@ namespace ForestProtectionForce.Controllers
 
             return updatedString;
 
+        }
+
+        [NonAction]
+
+        public string ConvertAndStoreImage(Offender offender)
+        {
+            string fileName = string.Empty;
+            using (var memoryStream = new MemoryStream(offender.Photo))
+            {
+                try
+                {
+                    // Use the memory stream to create a new Image object
+                    using (Image image = Image.Load(memoryStream))
+                    {
+                        // Resize the image to a maximum width of 800 pixels
+                        int maxWidth = 1000;
+                        int newWidth = Math.Min(maxWidth, image.Width);
+                        int newHeight = (int)((float)newWidth / image.Width * image.Height);
+                        image.Mutate(x => x.Resize(newWidth, newHeight));
+
+                        // Save the image to a file on disk
+                         fileName = offender.AadhaarNo + ".jpg"; // Set the file name and extension
+                       
+                        var filePath = Path.Combine(_env.WebRootPath, "Uploads", fileName);
+                        image.Save(filePath); // Save the image to disk
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // Handle the exception
+                }
+            }
+            return fileName;
+        }
+
+        [NonAction]
+        public Expression<Func<Offender, bool>> predicateLogicForData(UserDetails userData)
+        {
+            Expression<Func<Offender, bool>> condition = null;
+
+            if (userData.UserType_Id == 2 || userData.UserType_Id == 3 || userData.UserType_Id == 4)
+            {
+                condition = x => x.DistrictId == userData.DistrictId;
+            }
+            else
+            {
+                condition = x => true;
+            }
+
+            return condition;
         }
     }
 }

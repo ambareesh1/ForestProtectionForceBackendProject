@@ -29,7 +29,7 @@ namespace ForestProtectionForce.Controllers
           {
               return NotFound();
           }
-            var compartmentData = await _context.Compartment.ToListAsync();
+            var compartmentData = await _context.Compartment.OrderByDescending(x => x.Id).ToListAsync();
 
             foreach (var compartment in compartmentData)
             {

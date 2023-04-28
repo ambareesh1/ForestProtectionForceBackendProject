@@ -30,7 +30,7 @@ namespace ForestProtectionForce.Controllers
                 return NotFound();
             }
 
-            var circleData = await _context.Circle.ToListAsync();
+            var circleData = await _context.Circle.OrderByDescending(x => x.Id).ToListAsync();
 
             foreach (var circle in circleData)
             {

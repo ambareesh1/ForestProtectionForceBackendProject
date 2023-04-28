@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using ForestProtectionForce.utilities;
 using System;
 using Org.BouncyCastle.Crypto.Tls;
+using System.Linq;
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace ForestProtectionForce.Controllers
@@ -26,24 +27,30 @@ namespace ForestProtectionForce.Controllers
         {
             string xUserData = HttpContext.Request.Headers["X-User-Data"];
             var user = LogicConvertions.getUserDetails(xUserData??"");
-            bool isSuperAdmin = user.username == "superadmin";
+            int provinceOfSuperAdmins = LogicConvertions.getSuperAdminOfProvince(user);
             var userDetails = _context.UserDetails?.FirstOrDefault(x => x.Username == user.username) ?? new UserDetails();
+            var baselineDatails = _context.Baseline;
             var dashboard = new Dashboard();
             var boxModalData = new List<BoxModel>();
             boxModalData.AddRange(new List<BoxModel> {
-        new BoxModel { Name = "total", Count = _context.Baseline?.Count(predicateLogicForStatus(userDetails,isSuperAdmin,"Total")) },
-        new BoxModel { Name = "open", Count = _context.Baseline?.Count(predicateLogicForStatus(userDetails,isSuperAdmin, "Open")) },
-        new BoxModel { Name = "approved", Count = _context.Baseline?.Count(predicateLogicForStatus(userDetails,isSuperAdmin, "Approved")) },
-        new BoxModel { Name = "disposed", Count = _context.Baseline?.Count(predicateLogicForStatus(userDetails,isSuperAdmin, "Rejected")) }
+        new BoxModel { Name = "total", Count = baselineDatails?.Count(predicateLogicForStatus(userDetails,provinceOfSuperAdmins,"Total")) },
+        new BoxModel { Name = "open", Count = baselineDatails?.Count(predicateLogicForStatus(userDetails,provinceOfSuperAdmins, "Open")) },
+        new BoxModel { Name = "approved", Count = baselineDatails?.Count(predicateLogicForStatus(userDetails,provinceOfSuperAdmins, "Approved")) },
+        new BoxModel { Name = "disposed", Count = baselineDatails?.Count(predicateLogicForStatus(userDetails,provinceOfSuperAdmins, "Disposed")) }
     });
-            var chartDataBar = _context.Baseline?
-                .Where(predicateLogicForData(userDetails, isSuperAdmin))
-                .GroupBy(b => b.CrimeDate)
-                .Select(g => new Chart {name ="bar", xaxis = Convert.ToDateTime(g.Key).Year.ToString(), yaxis = g.Sum(b => b.Id).ToString() });
-            var chartDatapie = _context.Baseline?
-                .Where(predicateLogicForData(userDetails, isSuperAdmin))
+            var chartDataBar = baselineDatails
+                ?.Where(predicateLogicForData(userDetails, provinceOfSuperAdmins))
+                .GroupBy(b => b.CrimeDate.Year)
+                .Select(g => new Chart
+                {
+                    name = "bar",
+                    xaxis = g.Key.ToString(),
+                    yaxis = g.Count().ToString()
+                });
+            var chartDatapie = baselineDatails
+                .Where(predicateLogicForData(userDetails, provinceOfSuperAdmins))
                 .GroupBy(b => b.ForestDivisionName)
-                .Select(g => new Chart { name = "pie", xaxis = g.Key.ToString(), yaxis = g.Sum(b => b.ForestDivisionId).ToString() });
+                .Select(g => new Chart { name = "pie", xaxis = g.Key.ToString(), yaxis = g.Count().ToString() });
 
             dashboard.boxModels = boxModalData;
 
@@ -53,24 +60,29 @@ namespace ForestProtectionForce.Controllers
             chartsList.AddRange(chartDatapie.ToList().DistinctBy(x => x.xaxis).AsQueryable());
 
             dashboard.charts = chartsList;
-            dashboard.baseline = _context.Baseline?.Where(predicateLogicForData(userDetails, isSuperAdmin)).Take(5).ToList();
+            dashboard.baseline = baselineDatails?.Where(predicateLogicForData(userDetails, provinceOfSuperAdmins)).Take(5).ToList();
             return Ok(dashboard);
         }
 
         [NonAction]
-        public Func<Baseline, bool> predicateLogicForStatus(UserDetails userData, bool isSuperAdmin, string status)
+        public Func<Baseline, bool> predicateLogicForStatus(UserDetails userData, int provinceOfSuperAdmins, string status)
         {
             Func<Baseline, bool> condition;
 
                 if (userData.UserType_Id == 2)
                 {
-                   return condition = status == "Total" ? x => x.ForestDivisionId == userData.ProvinceId : x => x.Status == status && x.ForestDivisionId == userData.ProvinceId;
+                   return condition = status == "Total" ? x => x.ProvinceId == userData.ProvinceId : x => x.Status == status && x.ProvinceId == userData.ProvinceId;
                 }
                 else if (userData.UserType_Id == 3 || userData.UserType_Id == 4)
                 {
-                return condition = status == "Total" ? x => x.ForestDivisionId == userData.ProvinceId : x => x.Status == status && x.ForestDivisionId == userData.ProvinceId;
+                return condition = status == "Total" ? x => x.ForestDivisionId == userData.DistrictId : x => x.Status == status && x.ForestDivisionId == userData.DistrictId;
                 }
-                else
+                else if (provinceOfSuperAdmins == 1 || provinceOfSuperAdmins == 2) //jammu or kashmir
+                  {
+                return condition = status == "Total" ? x => x.ProvinceId == provinceOfSuperAdmins : x => x.Status == status && x.ProvinceId == provinceOfSuperAdmins;
+              }
+               
+            else
                 {
                 return condition = status == "Total" ? x => true : x => x.Status == status;
             }
@@ -79,17 +91,21 @@ namespace ForestProtectionForce.Controllers
         
 
         [NonAction]
-        public Func<Baseline, bool> predicateLogicForData(UserDetails userData, bool isSuperAdmin)
+        public Func<Baseline, bool> predicateLogicForData(UserDetails userData, int provinceOfSuperAdmins)
         {
             Func<Baseline, bool>? condition = null;
-           
+
             if (userData.UserType_Id == 2)
             {
-               return  condition = x =>  x.ForestDivisionId == userData.ProvinceId;
+                return condition = x => x.ProvinceId == userData.ProvinceId;
             }
             else if (userData.UserType_Id == 3 || userData.UserType_Id == 4)
             {
-               return condition = x =>  x.ForestDivisionId == userData.ProvinceId;
+                return condition = x => x.ForestDivisionId == userData.DistrictId;
+            }
+            else if (provinceOfSuperAdmins == 1 || provinceOfSuperAdmins == 2) //jammu or kashmir
+            {
+                return condition = x => x.ProvinceId ==provinceOfSuperAdmins;
             }
             else
             {

@@ -29,7 +29,7 @@ namespace ForestProtectionForce.Controllers
           {
               return NotFound();
           }
-            var districtData = await _context.District.ToListAsync();
+            var districtData = await _context.District.OrderByDescending(x => x.Id).ToListAsync();
 
             foreach (var district in districtData)
             {
