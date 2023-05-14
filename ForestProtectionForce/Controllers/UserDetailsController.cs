@@ -110,7 +110,7 @@ namespace ForestProtectionForce.Controllers
             {
                 return BadRequest();
             }
-
+           
             _context.Entry(userDetails).State = EntityState.Modified;
 
             try

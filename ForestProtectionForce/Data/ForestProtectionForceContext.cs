@@ -26,6 +26,9 @@ public partial class ForestProtectionForceContext : DbContext
     public virtual DbSet<Superadmin>? Superadmin { get; set; }
     public virtual DbSet<Images>? Images { get; set; }
     public virtual DbSet<Seizures_Form_A>? Seizures_Form_A { get; set; }
+    public virtual DbSet<Gamma_unit_form_b>? gamma_unit_form_b { get; set; }
+
+    public virtual DbSet<Seizure_CasesMonth_Form_C>? status_of_cases_form_c { get; set; }
     //public virtual DbSet<ApplicationRole>? Roles { get; set; }
     //public virtual DbSet<IdentityUserRole<string>>? UserRoles { get; set; }
 
