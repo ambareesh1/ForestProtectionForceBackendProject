@@ -29,6 +29,7 @@ public partial class ForestProtectionForceContext : DbContext
     public virtual DbSet<Gamma_unit_form_b>? gamma_unit_form_b { get; set; }
 
     public virtual DbSet<Seizure_CasesMonth_Form_C>? status_of_cases_form_c { get; set; }
+    public virtual DbSet<seizure_man_animal_conflict>? seizure_man_animal_conflict { get; set; }
     //public virtual DbSet<ApplicationRole>? Roles { get; set; }
     //public virtual DbSet<IdentityUserRole<string>>? UserRoles { get; set; }
 

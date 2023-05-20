@@ -337,7 +337,30 @@ namespace ForestProtectionForce.Controllers
             return formC;
 
         }
-       
+
+        [NonAction]
+        public seizure_man_animal_conflict ManAnimalConflict(int provinceId, int districtId)
+        {
+            seizure_man_animal_conflict seizure_Man_Animal_Conflict = new seizure_man_animal_conflict
+            {
+                DistrictId = districtId,
+                ProvinceId = provinceId,
+                Id  = 0,
+                NameOfGammaUnit = "",
+                NoOfFPFPersonnelDeployed = 0,
+                PlaceOfOccurrence= "",
+                Remarks = "",
+                IsActive = true,
+                LastUpdatedOn = DateTime.Now,
+                Month = DateTime.Now.Month,
+                Year = DateTime.Now.Year,
+                SNo = 1
+            };
+
+            return seizure_Man_Animal_Conflict;
+
+        }
+
 
         // Form B Gamma Unit
 
@@ -488,9 +511,70 @@ namespace ForestProtectionForce.Controllers
             List<Seizure_CasesMonth_Form_C> formC = getSeizureCasesOfMonthC(seizure_CasesMonth_Form_C.ProvinceId, seizure_CasesMonth_Form_C.DistrictId);
             _context.status_of_cases_form_c.AddRange(formC);
             await _context.SaveChangesAsync();
-            await _context.SaveChangesAsync();
+          
 
             return CreatedAtAction("Seizures_Form_C", new { id = 1 }, formC);
+        }
+
+        // Man & Animal Conflict 
+
+
+        [HttpGet("CheckManAnimalConflictAlreadyExistForDistrictAndMonth")]
+        public async Task<ActionResult<IEnumerable<seizure_man_animal_conflict>>> CheckGetManAnimalConflictAlreadyExistForDistrictAndMonth(int id)
+        {
+            var formC = await _context.seizure_man_animal_conflict.Where(x => x.DistrictId == id && x.Month == DateTime.Now.Month && x.Year == DateTime.Now.Year).ToListAsync();
+
+            if (formC == null)
+            {
+                return null;
+            }
+
+            return formC;
+        }
+
+        [HttpPost("PostCasesOfMonthManAnimalConflict")]
+        public async Task<ActionResult<seizure_man_animal_conflict>> PostManAnimalConflict(seizure_man_animal_conflict seizure_Man_Animal_Conflicts)
+        {
+            if (_context.seizure_man_animal_conflict == null)
+            {
+                return Problem("Entity set 'ForestProtectionForceContext.seizure_Man_Animal_Conflict'  is null.");
+            }
+
+          seizure_man_animal_conflict manAnimalConflicts = ManAnimalConflict(seizure_Man_Animal_Conflicts.ProvinceId??0 , seizure_Man_Animal_Conflicts.DistrictId??0);
+            _context.seizure_man_animal_conflict.Add(manAnimalConflicts);
+            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("Man Animal Conflicts", new { id = 1 }, manAnimalConflicts);
+        }
+
+        [HttpPut("UpdateMonthManAnimalConflict{id}")]
+        public async Task<IActionResult> UpdateMonthManAnimalConflict(int id, seizure_man_animal_conflict seizure_Man_Animal_Conflict)
+        {
+            if (id != seizure_Man_Animal_Conflict.Id)
+            {
+                return BadRequest();
+            }
+
+            _context.Entry(seizure_Man_Animal_Conflict).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!FormAExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
         }
 
     }

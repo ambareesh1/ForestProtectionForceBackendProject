@@ -75,6 +75,7 @@ namespace ForestProtectionForce.Services
 
         public string GenerateRandomPassword()
         {
+            if (_emailService.IsDefaultPassword()) { 
             const string validChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*()";
             var randomBytes = new byte[8];
             using (var rng = RandomNumberGenerator.Create())
@@ -87,6 +88,8 @@ namespace ForestProtectionForce.Services
                 passwordBuilder.Append(validChars[b % validChars.Length]);
             }
             return  passwordBuilder.ToString();
+            }
+            return "test";
         }
 
         public void  SendRandomPasswordToUser(UserDetails userDetails)

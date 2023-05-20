@@ -1,4 +1,5 @@
 ﻿using ForestProtectionForce.Models;
+using K4os.Compression.LZ4.Internal;
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using Microsoft.Extensions.Options;
@@ -22,6 +23,7 @@ namespace ForestProtectionForce.Services
 
         public async Task SendEmailAsync(string toEmail, string subject, string htmlContent)
         {
+            if (_emailConfiguration.isOtpRequired) { 
             var message = new MimeMessage();
             message.From.Add(new MailboxAddress(_emailConfiguration.FromName, _emailConfiguration.FromAddress));
             message.To.Add(new MailboxAddress("", toEmail));
@@ -37,6 +39,11 @@ namespace ForestProtectionForce.Services
             await client.AuthenticateAsync(_emailConfiguration.SmtpUsername, _emailConfiguration.SmtpPassword);
             await client.SendAsync(message);
             await client.DisconnectAsync(true);
+            }
+        }
+        public bool IsDefaultPassword()
+        {
+            return _emailConfiguration.isOtpRequired;
         }
     }
 

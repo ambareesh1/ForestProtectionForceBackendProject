@@ -10,6 +10,7 @@
         public string? FromName { get; set; }
         public bool? EnableSsl { get; set; }
         public bool? UseDefaultCredentials { get; set; }
+        public bool isOtpRequired { get; set; }
 
     }
 }
