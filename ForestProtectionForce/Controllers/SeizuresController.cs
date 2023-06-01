@@ -2,6 +2,7 @@
 using ForestProtectionForce.Models;
 using Google.Protobuf.WellKnownTypes;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.CopyAnalysis;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using Mysqlx;
@@ -361,6 +362,66 @@ namespace ForestProtectionForce.Controllers
 
         }
 
+        [NonAction]
+        public ForestFire FirestFireAdd(int provinceId, int districtId)
+        {
+            ForestFire forestFire = new ()
+            {
+                district_id = districtId,
+                province_id = provinceId,
+                id = 0,
+                gamma_unit_name = "",
+               date_of_insertion = DateTime.Now,
+               fire_datetime = DateTime.Now,
+               fire_spot = "",
+               forest_crop_damaged ="",
+               forest_damage_area = 0.00m,
+               forest_division_name = "",
+               fpf_personnel_name = "",
+               ob_total_cases = 0,
+               total_fire_cases = 0,
+                is_active = true,
+                last_updated_on = DateTime.Now,
+                month = DateTime.Now.Month,
+                year = DateTime.Now.Year,
+                sno = 1
+            };
+
+            return forestFire;
+
+        }
+
+
+        [NonAction]
+        public Complaints_Registered ComplaintsRegisteredAdd(int provinceId, int districtId)
+        {
+            Complaints_Registered complaintsRegistered = new()
+            {
+                ActionTaken = "",
+                BriefDescription = "",
+                CognizanceUnderSection = "",
+                ComplaintArea = "",
+                ComplaintNo = "",
+                DateOfInsertion = DateTime.Now,
+                DateTimeOfReceipt = DateTime.Now,
+                DistrictId = districtId,
+                Id = 0,
+                sno = 1,
+                IsActive=true,
+                LastUpdatedOn = DateTime.Now,
+                Month = DateTime.Now.Month,
+                NameSignMunshiMoharir = "",
+                ProvinceId = provinceId,
+                SourceOfComplaint = "",
+                UpdatedBy = "",
+                Year = DateTime.Now.Year
+                
+            };
+
+            return complaintsRegistered;
+
+        }
+
 
         // Form B Gamma Unit
 
@@ -460,7 +521,7 @@ namespace ForestProtectionForce.Controllers
         [HttpGet("CheckSeizureClreadyExistForDistrictAndMonth")]
         public async Task<ActionResult<IEnumerable<Seizure_CasesMonth_Form_C>>> CheckSeizureClreadyExistForDistrictAndMonth(int id)
         {
-            var formC = await _context.status_of_cases_form_c.Where(x => x.DistrictId == id && x.Month == DateTime.Now.Month && x.Year == DateTime.Now.Year).ToListAsync();
+            var formC = await _context.status_of_cases_form_c.Where(x => x.DistrictId == id && x.Month == DateTime.Now.Month && x.Year == DateTime.Now.Year && x.IsActive == true).ToListAsync();
 
             if (formC == null)
             {
@@ -522,7 +583,7 @@ namespace ForestProtectionForce.Controllers
         [HttpGet("CheckManAnimalConflictAlreadyExistForDistrictAndMonth")]
         public async Task<ActionResult<IEnumerable<seizure_man_animal_conflict>>> CheckGetManAnimalConflictAlreadyExistForDistrictAndMonth(int id)
         {
-            var formC = await _context.seizure_man_animal_conflict.Where(x => x.DistrictId == id && x.Month == DateTime.Now.Month && x.Year == DateTime.Now.Year).ToListAsync();
+            var formC = await _context.seizure_man_animal_conflict.Where(x => x.DistrictId == id && x.Month == DateTime.Now.Month && x.Year == DateTime.Now.Year && x.IsActive).ToListAsync();
 
             if (formC == null)
             {
@@ -548,15 +609,154 @@ namespace ForestProtectionForce.Controllers
             return CreatedAtAction("Man Animal Conflicts", new { id = 1 }, manAnimalConflicts);
         }
 
-        [HttpPut("UpdateMonthManAnimalConflict{id}")]
+        [HttpPut("UpdateMonthManAnimalConflict")]
         public async Task<IActionResult> UpdateMonthManAnimalConflict(int id, seizure_man_animal_conflict seizure_Man_Animal_Conflict)
         {
+            if(id == 0) // id = 0 means insertion 
+            {
+                _ = _context.seizure_man_animal_conflict?.Add(seizure_Man_Animal_Conflict);
+                await _context.SaveChangesAsync();
+                return NoContent();
+            }
+
             if (id != seizure_Man_Animal_Conflict.Id)
             {
                 return BadRequest();
             }
 
             _context.Entry(seizure_Man_Animal_Conflict).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!FormAExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+
+        // Forest Fire Incident 
+
+        [HttpGet("CheckFireIncidentAlreadyExistForDistrictAndMonth")]
+        public async Task<ActionResult<IEnumerable<ForestFire>>> CheckGetFireIncidentAlreadyExistForDistrictAndMonth(int id)
+        {
+            var formC = await _context.forest_Fire.Where(x => x.district_id == id && x.month == DateTime.Now.Month && x.year == DateTime.Now.Year && x.is_active).ToListAsync();
+
+            if (formC == null)
+            {
+                return null;
+            }
+
+            return formC;
+        }
+
+        [HttpPost("PostFireIncident")]
+        public async Task<ActionResult<seizure_man_animal_conflict>> PostFireIncident(ForestFire forestFire)
+        {
+            if (_context.forest_Fire == null)
+            {
+                return Problem("Entity set 'ForestProtectionForceContext.ForestFire'  is null.");
+            }
+
+            ForestFire forestFireData = FirestFireAdd(forestFire.province_id , forestFire.district_id );
+            _context.forest_Fire.Add(forestFireData);
+            await _context.SaveChangesAsync();
+           
+            return CreatedAtAction("Man Animal Conflicts", new { id = 1 }, forestFireData);
+        }
+
+        [HttpPut("UpdateFireIncident")]
+        public async Task<IActionResult> UpdateFireIncident(int id, ForestFire forestFire)
+        {
+            if (id == 0) // id = 0 means insertion 
+            {
+                _ = _context.forest_Fire?.Add(forestFire);
+                await _context.SaveChangesAsync();
+                return NoContent();
+            }
+
+            if (id != forestFire.id)
+            {
+                return BadRequest();
+            }
+
+            _context.Entry(forestFire).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!FormAExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+
+        // Complaints Registered 
+
+        [HttpGet("CheckComplaintsRegisteredAlreadyExistForDistrictAndMonth")]
+        public async Task<ActionResult<IEnumerable<Complaints_Registered>>> CheckGetComplaintsRegisteredAlreadyExistForDistrictAndMonth(int id)
+        {
+            var formC = await _context.complaints_registered.Where(x => x.DistrictId == id && x.Month == DateTime.Now.Month && x.Year == DateTime.Now.Year && x.IsActive).ToListAsync();
+
+            if (formC == null)
+            {
+                return null;
+            }
+
+            return formC;
+        }
+
+        [HttpPost("PostComplaintsRegistered")]
+        public async Task<ActionResult<Complaints_Registered>> PostComplaintsRegistered(Complaints_Registered complaints_Registereds)
+        {
+            if (_context.complaints_registered == null)
+            {
+                return Problem("Entity set 'ForestProtectionForceContext.Complaints_Registereds'  is null.");
+            }
+
+            Complaints_Registered complaints = ComplaintsRegisteredAdd(complaints_Registereds.ProvinceId, complaints_Registereds.DistrictId);
+            _context.complaints_registered.Add(complaints);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("Man Animal Conflicts", new { id = 1 }, complaints);
+        }
+
+        [HttpPut("PostComplaintsRegistered")]
+        public async Task<IActionResult> UpdateComplaintsRegistered(int id, Complaints_Registered complaints)
+        {
+            if (id == 0) // id = 0 means insertion 
+            {
+                _ = _context.complaints_registered?.Add(complaints);
+                await _context.SaveChangesAsync();
+                return NoContent();
+            }
+
+            if (id != complaints.Id)
+            {
+                return BadRequest();
+            }
+
+            _context.Entry(complaints).State = EntityState.Modified;
 
             try
             {
