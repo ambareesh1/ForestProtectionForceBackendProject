@@ -419,9 +419,33 @@ namespace ForestProtectionForce.Controllers
             };
 
             return complaintsRegistered;
-
         }
 
+        [NonAction]
+        public ForestOffender ForestOffenderAdd(int provinceId, int districtId)
+        {
+            ForestOffender forestOffender = new()
+            {
+                Id = 0,
+                ActiveDormant = "",
+                AreaOfOperations = "",
+                CasesRegistered = 0,
+                CasesStatus = "",
+                DateOfInsertion = DateTime.Now,
+                DistrictId = districtId,
+                ProvinceId = provinceId,
+                IsActive = true,
+                LastUpdatedOn = DateTime.Now,
+                ModusOperandi = "",
+                Month = DateTime.Now.Month,
+                Year = DateTime.Now.Year,
+                NameOfForestOffender = "",
+                Sno = 1, 
+                UpdatedBy = ""
+            };
+
+            return forestOffender;
+        }
 
         // Form B Gamma Unit
 
@@ -757,6 +781,72 @@ namespace ForestProtectionForce.Controllers
             }
 
             _context.Entry(complaints).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!FormAExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+
+        // Forest Offenders
+
+        [HttpGet("CheckForestOffendersAlreadyExistForDistrictAndMonth")]
+        public async Task<ActionResult<IEnumerable<ForestOffender>>> CheckForestOffendersAlreadyExistForDistrictAndMonth(int id)
+        {
+            var formC = await _context.ForestOffenders.Where(x => x.DistrictId == id && x.Month == DateTime.Now.Month && x.Year == DateTime.Now.Year && x.IsActive).ToListAsync();
+
+            if (formC == null)
+            {
+                return null;
+            }
+
+            return formC;
+        }
+
+        [HttpPost("PostForestOffenders")]
+        public async Task<ActionResult<ForestOffender>> PostForestOffenders(ForestOffender forestOffenderData)
+        {
+            if (_context.ForestOffenders == null)
+            {
+                return Problem("Entity set 'ForestProtectionForceContext.Forest_Offenders'  is null.");
+            }
+
+            ForestOffender forestOffender = ForestOffenderAdd(forestOffenderData.ProvinceId, forestOffenderData.DistrictId);
+            _context.ForestOffenders.Add(forestOffender);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("Man Animal Conflicts", new { id = 1 }, forestOffender);
+        }
+
+        [HttpPut("UpdateForestOffenders")]
+        public async Task<IActionResult> UpdateForestOffenders(int id, ForestOffender forestOffender)
+        {
+            if (id == 0) // id = 0 means insertion 
+            {
+                _ = _context.ForestOffenders?.Add(forestOffender);
+                await _context.SaveChangesAsync();
+                return NoContent();
+            }
+
+            if (id != forestOffender.Id)
+            {
+                return BadRequest();
+            }
+
+            _context.Entry(forestOffender).State = EntityState.Modified;
 
             try
             {

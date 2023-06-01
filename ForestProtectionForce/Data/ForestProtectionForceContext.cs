@@ -32,8 +32,7 @@ public partial class ForestProtectionForceContext : DbContext
     public virtual DbSet<seizure_man_animal_conflict>? seizure_man_animal_conflict { get; set; }
     public virtual DbSet<ForestFire>? forest_Fire { get; set; }
     public virtual DbSet<Complaints_Registered>? complaints_registered { get; set; }
-    //public virtual DbSet<ApplicationRole>? Roles { get; set; }
-    //public virtual DbSet<IdentityUserRole<string>>? UserRoles { get; set; }
+    public virtual DbSet<ForestOffender>? ForestOffenders { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
