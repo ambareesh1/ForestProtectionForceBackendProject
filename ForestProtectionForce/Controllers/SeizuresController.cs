@@ -447,6 +447,281 @@ namespace ForestProtectionForce.Controllers
             return forestOffender;
         }
 
+        [NonAction]
+        public List<AntiPochingFormA> AntiPochingFormAAdd(int provinceId, int districtId)
+        {
+            List<AntiPochingFormA> formA = new List<AntiPochingFormA>{
+
+            new AntiPochingFormA
+            {
+                Id = 0,
+                Activity = "Jungle Gasht/Aabhi Gasht",
+                Details = "",
+                Unit = "No",
+                DateOfInsertion = DateTime.Now,
+                DistrictId = districtId,
+                ProvinceId = provinceId,
+                IsActive = true,
+                LastUpdatedOn = DateTime.Now,
+
+                Month = DateTime.Now.Month,
+                Year = DateTime.Now.Year,
+                Sno = 1,
+                UpdatedBy = ""
+            },
+            new AntiPochingFormA
+            {
+
+                Id = 0,
+                Activity = "Vehicle/Vessel Checking",
+                Details = "",
+                Unit = "No",
+                DateOfInsertion = DateTime.Now,
+                DistrictId = districtId,
+                ProvinceId = provinceId,
+                IsActive = true,
+                LastUpdatedOn = DateTime.Now,
+
+                Month = DateTime.Now.Month,
+                Year = DateTime.Now.Year,
+                Sno = 2,
+                UpdatedBy = ""
+            },
+            new AntiPochingFormA
+            {
+
+                Id = 0,
+                Activity = "Houses/Buildings Search (with details)",
+                Details = "",
+                Unit = "No",
+                DateOfInsertion = DateTime.Now,
+                DistrictId = districtId,
+                ProvinceId = provinceId,
+                IsActive = true,
+                LastUpdatedOn = DateTime.Now,
+
+                Month = DateTime.Now.Month,
+                Year = DateTime.Now.Year,
+                Sno = 3,
+                UpdatedBy = ""
+            },
+          
+            new AntiPochingFormA
+            {
+
+                Id = 0,
+                Activity = "Foot Patroling (with details of location)",
+                Details = "",
+                Unit = "Kms",
+                DateOfInsertion = DateTime.Now,
+                DistrictId = districtId,
+                ProvinceId = provinceId,
+                IsActive = true,
+                LastUpdatedOn = DateTime.Now,
+
+                Month = DateTime.Now.Month,
+                Year = DateTime.Now.Year,
+                Sno = 4,
+                UpdatedBy = ""
+            },
+             new AntiPochingFormA
+            {
+
+                Id = 0,
+                Activity = "Vehicle Patroling (with details of location)",
+                Details = "",
+                Unit = "Kms",
+                DateOfInsertion = DateTime.Now,
+                DistrictId = districtId,
+                ProvinceId = provinceId,
+                IsActive = true,
+                LastUpdatedOn = DateTime.Now,
+
+                Month = DateTime.Now.Month,
+                Year = DateTime.Now.Year,
+                Sno = 5,
+                UpdatedBy = ""
+            },
+             new AntiPochingFormA
+            {
+
+                Id = 0,
+                Activity = "Naka (with details of location)",
+                Details = "",
+                Unit = "Kms",
+                DateOfInsertion = DateTime.Now,
+                DistrictId = districtId,
+                ProvinceId = provinceId,
+                IsActive = true,
+                LastUpdatedOn = DateTime.Now,
+
+                Month = DateTime.Now.Month,
+                Year = DateTime.Now.Year,
+                Sno = 6,
+                UpdatedBy = ""
+            } };
+            return formA;
+        }
+
+
+        [NonAction]
+        public List<AntiPochingFormB> AntiPochingFormBAdd(int provinceId, int districtId)
+        {
+            List<AntiPochingFormB> formB = new List<AntiPochingFormB>{
+
+            new AntiPochingFormB
+            {
+                Id = 0,
+                Article = "Boat",
+                Details = "",
+                Unit = "No",
+                DateOfInsertion = DateTime.Now,
+                DistrictId = districtId,
+                ProvinceId = provinceId,
+                IsActive = true,
+                LastUpdatedOn = DateTime.Now,
+
+                Month = DateTime.Now.Month,
+                Year = DateTime.Now.Year,
+                Sno = 1,
+                UpdatedBy = ""
+            },
+            new AntiPochingFormB
+            {
+
+                Id = 0,
+                Article = "Gun (Type)",
+                Details = "",
+                Unit = "No",
+                DateOfInsertion = DateTime.Now,
+                DistrictId = districtId,
+                ProvinceId = provinceId,
+                IsActive = true,
+                LastUpdatedOn = DateTime.Now,
+
+                Month = DateTime.Now.Month,
+                Year = DateTime.Now.Year,
+                Sno = 2,
+                UpdatedBy = ""
+            },
+            new AntiPochingFormB
+            {
+
+                Id = 0,
+                Article = "Decoys",
+                Details = "",
+                Unit = "No",
+                DateOfInsertion = DateTime.Now,
+                DistrictId = districtId,
+                ProvinceId = provinceId,
+                IsActive = true,
+                LastUpdatedOn = DateTime.Now,
+
+                Month = DateTime.Now.Month,
+                Year = DateTime.Now.Year,
+                Sno = 3,
+                UpdatedBy = ""
+            },
+
+            new AntiPochingFormB
+            {
+
+                Id = 0,
+                Article = "Vehicles",
+                Details = "",
+                Unit = "No",
+                DateOfInsertion = DateTime.Now,
+                DistrictId = districtId,
+                ProvinceId = provinceId,
+                IsActive = true,
+                LastUpdatedOn = DateTime.Now,
+
+                Month = DateTime.Now.Month,
+                Year = DateTime.Now.Year,
+                Sno = 4,
+                UpdatedBy = ""
+            },
+             new AntiPochingFormB
+            {
+
+                Id = 0,
+                Article = "Carcass (Scheduled Animal)",
+                Details = "",
+                Unit = "No",
+                DateOfInsertion = DateTime.Now,
+                DistrictId = districtId,
+                ProvinceId = provinceId,
+                IsActive = true,
+                LastUpdatedOn = DateTime.Now,
+
+                Month = DateTime.Now.Month,
+                Year = DateTime.Now.Year,
+                Sno = 5,
+                UpdatedBy = ""
+            },
+             new AntiPochingFormB
+            {
+
+                Id = 0,
+                Article = "Trophy, Hide, Nail, Fur, Glands etc",
+                Details = "",
+                Unit = "No",
+                DateOfInsertion = DateTime.Now,
+                DistrictId = districtId,
+                ProvinceId = provinceId,
+                IsActive = true,
+                LastUpdatedOn = DateTime.Now,
+
+                Month = DateTime.Now.Month,
+                Year = DateTime.Now.Year,
+                Sno = 6,
+                UpdatedBy = ""
+            },
+             new AntiPochingFormB
+            {
+
+                Id = 0,
+                Article = "Any Other article (Please specify)",
+                Details = "",
+                Unit = "No",
+                DateOfInsertion = DateTime.Now,
+                DistrictId = districtId,
+                ProvinceId = provinceId,
+                IsActive = true,
+                LastUpdatedOn = DateTime.Now,
+
+                Month = DateTime.Now.Month,
+                Year = DateTime.Now.Year,
+                Sno = 6,
+                UpdatedBy = ""
+            }};
+            return formB;
+        }
+
+
+        [NonAction]
+        public AntiPochingFormC AntiPochingFormCAdd(int provinceId, int districtId)
+        {
+            AntiPochingFormC forestOffender = new()
+            {
+                Id = 0,
+               Details ="",
+               FIRRegistered ="",
+               NoDate = "",
+                DateOfInsertion = DateTime.Now,
+                DistrictId = districtId,
+                ProvinceId = provinceId,
+                IsActive = true,
+                LastUpdatedOn = DateTime.Now,
+                Month = DateTime.Now.Month,
+                Year = DateTime.Now.Year,
+                Sno = 1,
+                UpdatedBy = ""
+            };
+
+            return forestOffender;
+        }
+
         // Form B Gamma Unit
 
         [HttpGet("GammaUnitB")]
@@ -847,6 +1122,196 @@ namespace ForestProtectionForce.Controllers
             }
 
             _context.Entry(forestOffender).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!FormAExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+
+        // Anti-Poching Form A
+       
+        [HttpGet("CheckAntiPochingAlreadyExistForDistrictAndMonth")]
+        public async Task<ActionResult<IEnumerable<AntiPochingFormA>>> CheckAntiPochingFormAAlreadyExistForDistrictAndMonth(int id)
+        {
+            var formC = await _context.AntiPochingFormA.Where(x => x.DistrictId == id && x.Month == DateTime.Now.Month && x.Year == DateTime.Now.Year && x.IsActive).ToListAsync();
+
+            if (formC == null)
+            {
+                return null;
+            }
+
+            return formC;
+        }
+
+        [HttpPost("PostAntiPochingFormA")]
+        public async Task<ActionResult<AntiPochingFormA>> PostForestOffenders(AntiPochingFormA  antiPochingFormA)
+        {
+            if (_context.AntiPochingFormA == null)
+            {
+                return Problem("Entity set 'ForestProtectionForceContext.antiPochingFormA'  is null.");
+            }
+
+            List<AntiPochingFormA> antiPochingForm = AntiPochingFormAAdd(antiPochingFormA.ProvinceId, antiPochingFormA.DistrictId);
+            _context.AntiPochingFormA.AddRange(antiPochingForm);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("Man Animal Conflicts", new { id = 1 }, antiPochingForm[0]);
+        }
+
+        [HttpPut("UpdateAntiPochingFormA")]
+        public async Task<IActionResult> UpdateAntiPochingFormA(int id, AntiPochingFormA antiPochingFormA)
+        {
+            
+
+            if (id != antiPochingFormA.Id)
+            {
+                return BadRequest();
+            }
+
+            _context.Entry(antiPochingFormA).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!FormAExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+
+        // Anti-Poching Form B
+
+        [HttpGet("CheckAntiPochingBAlreadyExistForDistrictAndMonth")]
+        public async Task<ActionResult<IEnumerable<AntiPochingFormB>>> CheckAntiPochingFormBAlreadyExistForDistrictAndMonth(int id)
+        {
+            var formC = await _context.AntiPochingFormB.Where(x => x.DistrictId == id && x.Month == DateTime.Now.Month && x.Year == DateTime.Now.Year && x.IsActive).ToListAsync();
+
+            if (formC == null)
+            {
+                return null;
+            }
+
+            return formC;
+        }
+
+        [HttpPost("PostAntiPochingFormB")]
+        public async Task<ActionResult<AntiPochingFormA>> PostAntiPochingFormB(AntiPochingFormB antiPochingFormB)
+        {
+            if (_context.AntiPochingFormB == null)
+            {
+                return Problem("Entity set 'ForestProtectionForceContext.antiPochingFormB'  is null.");
+            }
+
+            List<AntiPochingFormB> antiPochingForm = AntiPochingFormBAdd(antiPochingFormB.ProvinceId, antiPochingFormB.DistrictId);
+            _context.AntiPochingFormB.AddRange(antiPochingForm);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("Man Animal Conflicts", new { id = 1 }, antiPochingForm[0]);
+        }
+
+        [HttpPut("UpdateAntiPochingFormB")]
+        public async Task<IActionResult> UpdateAntiPochingFormB(int id, AntiPochingFormB antiPochingFormB)
+        {
+
+
+            if (id != antiPochingFormB.Id)
+            {
+                return BadRequest();
+            }
+
+            _context.Entry(antiPochingFormB).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!FormAExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+
+        // Anti-Poching Form C
+
+        [HttpGet("CheckAntiPochingCAlreadyExistForDistrictAndMonth")]
+        public async Task<ActionResult<IEnumerable<AntiPochingFormC>>> CheckAntiPochingFormCAlreadyExistForDistrictAndMonth(int id)
+        {
+            var formC = await _context.AntiPochingFormC.Where(x => x.DistrictId == id && x.Month == DateTime.Now.Month && x.Year == DateTime.Now.Year && x.IsActive).ToListAsync();
+
+            if (formC == null)
+            {
+                return null;
+            }
+
+            return formC;
+        }
+
+        [HttpPost("PostAntiPochingFormC")]
+        public async Task<ActionResult<AntiPochingFormC>> PostAntiPochingFormC(AntiPochingFormC antiPochingFormC)
+        {
+            if (_context.AntiPochingFormB == null)
+            {
+                return Problem("Entity set 'ForestProtectionForceContext.antiPochingFormC'  is null.");
+            }
+
+            AntiPochingFormC antiPochingForm = AntiPochingFormCAdd(antiPochingFormC.ProvinceId, antiPochingFormC.DistrictId);
+            _context.AntiPochingFormC.Add(antiPochingForm);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("Man Animal Conflicts", new { id = 1 }, antiPochingForm);
+        }
+
+
+        [HttpPut("UpdateAntiPochingFormC")]
+        public async Task<IActionResult> UpdateAntiPochingFormC(int id, AntiPochingFormC antiPochingFormC)
+        {
+            if (id == 0) // id = 0 means insertion 
+            {
+                _ = _context.AntiPochingFormC?.Add(antiPochingFormC);
+                await _context.SaveChangesAsync();
+                return NoContent();
+            }
+
+
+            if (id != antiPochingFormC.Id)
+            {
+                return BadRequest();
+            }
+
+            _context.Entry(antiPochingFormC).State = EntityState.Modified;
 
             try
             {
