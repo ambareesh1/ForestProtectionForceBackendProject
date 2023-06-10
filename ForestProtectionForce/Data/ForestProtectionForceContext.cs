@@ -36,6 +36,8 @@ public partial class ForestProtectionForceContext : DbContext
     public virtual DbSet<AntiPochingFormA>? AntiPochingFormA { get; set; }
     public virtual DbSet<AntiPochingFormB>? AntiPochingFormB { get; set; }
     public virtual DbSet<AntiPochingFormC>? AntiPochingFormC { get; set; }
+    public virtual DbSet<HistorySheet>? HistorySheet { get; set; }
+    public virtual DbSet<DisposedCases>? DisposedCases { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
