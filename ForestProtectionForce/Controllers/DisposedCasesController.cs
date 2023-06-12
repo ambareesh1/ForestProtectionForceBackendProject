@@ -69,7 +69,7 @@ namespace ForestProtectionForce.Controllers
             _context.DisposedCases.Add(disposedCases);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("PostDisposedSheet", new { id = disposedCases.Id }, disposedCases);
+            return CreatedAtAction("PostDisposedCases", new { id = disposedCases.Id }, disposedCases);
         }
 
         // PUT api/<DisposedCasesController>/5
