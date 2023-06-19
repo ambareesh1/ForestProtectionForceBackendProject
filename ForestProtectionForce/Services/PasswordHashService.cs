@@ -89,7 +89,7 @@ namespace ForestProtectionForce.Services
             }
             return  passwordBuilder.ToString();
             }
-            return "test";
+            return "forest@654321";
         }
 
         public void  SendRandomPasswordToUser(UserDetails userDetails)
