@@ -36,7 +36,7 @@ namespace ForestProtectionForce.Controllers
             var user = LogicConvertions.getUserDetails(xUserData ?? "");
             int provinceOfSuperAdmins = LogicConvertions.getSuperAdminOfProvince(user);
             var userDetails = _context.UserDetails?.FirstOrDefault(x => x.Username == user.username) ?? new UserDetails();
-            return await _context.UserDetails.Where(predicateLogicForData(userDetails, provinceOfSuperAdmins)).OrderByDescending(x=>x.Id).ToListAsync();
+            return await _context.UserDetails.Where(predicateLogicForData(userDetails, provinceOfSuperAdmins)).OrderByDescending(x => x.Id).ToListAsync();
         }
 
         [HttpGet("userTypes")]

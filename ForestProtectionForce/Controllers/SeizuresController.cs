@@ -1,17 +1,7 @@
 ﻿using ForestProtectionForce.Data;
 using ForestProtectionForce.Models;
-using Google.Protobuf.WellKnownTypes;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.CopyAnalysis;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
-using Mysqlx;
-using System;
-using System.Drawing;
-using System.Runtime.ConstrainedExecution;
-using System.Text;
-using System.Xml.Linq;
-using static Mysqlx.Notice.Warning.Types;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -214,12 +204,12 @@ namespace ForestProtectionForce.Controllers
                     id = 0,
                     serialNo = item.SerialNo,
                     name = item.Name,
-                    ob_independent = "",
-                    during_month_independent = "",
-                    total_independent = "",
-                    ob_joint = "",
-                    during_month_joint = "",
-                    total_joint = "",
+                    ob_independent = 0.00m,
+                    during_month_independent = 0.00m,
+                    total_independent = 0.00m,
+                    ob_joint = 0.00m,
+                    during_month_joint = 0.00m,
+                    total_joint = 0.00m,
                     provinceId = provinceId,
                     districtId = districtId,
                     DateOfInsertion = DateTime.Now,
@@ -729,7 +719,7 @@ namespace ForestProtectionForce.Controllers
         // Form B Gamma Unit
 
         [HttpGet("GammaUnitB")]
-        public async Task<ActionResult<IEnumerable<Gamma_unit_form_b>>> GetSeizureGammUnitFormB()
+        public async Task<ActionResult<IEnumerable<Gamma_unit_form_b>>> GammaUnitB()
         {
             try
             {
@@ -746,7 +736,7 @@ namespace ForestProtectionForce.Controllers
         }
 
         [HttpPut("UpdateGammaUnitFromB{id}")]
-        public async Task<IActionResult> PutFormB(int id, Gamma_unit_form_b seizures_GammaUnit_Form_B)
+        public async Task<IActionResult> UpdateGammaUnitFromB(int id, Gamma_unit_form_b seizures_GammaUnit_Form_B)
         {
             if (id != seizures_GammaUnit_Form_B.Id)
             {
@@ -775,7 +765,7 @@ namespace ForestProtectionForce.Controllers
         }
 
         [HttpGet("GetGammaUnitFormBWithDistrict")]
-        public async Task<ActionResult<IEnumerable<Gamma_unit_form_b>>> GetFormBOnDistrict(int districtId, int month = 0)
+        public async Task<ActionResult<IEnumerable<Gamma_unit_form_b>>> GetGammaUnitFormBWithDistrict(int districtId, int month = 0)
         {
             try
             {
@@ -838,7 +828,7 @@ namespace ForestProtectionForce.Controllers
         }
 
         [HttpPut("UpdateCaseOfMonthFromC")]
-        public async Task<IActionResult> PutFormC(int id, List<Seizure_CasesMonth_Form_C> seizure_CasesMonth_Form_C)
+        public async Task<IActionResult> UpdateCaseOfMonthFromC(int id, List<Seizure_CasesMonth_Form_C> seizure_CasesMonth_Form_C)
         {
             foreach (var item in seizure_CasesMonth_Form_C)
             {
@@ -954,7 +944,7 @@ namespace ForestProtectionForce.Controllers
         // Forest Fire Incident 
 
         [HttpGet("CheckFireIncidentAlreadyExistForDistrictAndMonth")]
-        public async Task<ActionResult<IEnumerable<ForestFire>>> CheckGetFireIncidentAlreadyExistForDistrictAndMonth(int id, int month = 0)
+        public async Task<ActionResult<IEnumerable<ForestFire>>> CheckFireIncidentAlreadyExistForDistrictAndMonth(int id, int month = 0)
         {
             month = month == 0 ? DateTime.Now.Month : month;
             var formC = await _context.forest_Fire.Where(x => x.district_id == id && x.month == month && x.year == DateTime.Now.Year && x.is_active).ToListAsync();
@@ -979,7 +969,7 @@ namespace ForestProtectionForce.Controllers
             _context.forest_Fire.Add(forestFireData);
             await _context.SaveChangesAsync();
            
-            return CreatedAtAction("Man Animal Conflicts", new { id = 1 }, forestFireData);
+            return CreatedAtAction("PostFireIncident", new { id = 1 }, forestFireData);
         }
 
         [HttpPut("UpdateFireIncident")]
@@ -1021,7 +1011,7 @@ namespace ForestProtectionForce.Controllers
         // Complaints Registered 
 
         [HttpGet("CheckComplaintsRegisteredAlreadyExistForDistrictAndMonth")]
-        public async Task<ActionResult<IEnumerable<Complaints_Registered>>> CheckGetComplaintsRegisteredAlreadyExistForDistrictAndMonth(int id, int month = 0)
+        public async Task<ActionResult<IEnumerable<Complaints_Registered>>> CheckComplaintsRegisteredAlreadyExistForDistrictAndMonth(int id, int month = 0)
         {
             month = month == 0 ? DateTime.Now.Month : month;
             var formC = await _context.complaints_registered.Where(x => x.DistrictId == id && x.Month == month && x.Year == DateTime.Now.Year && x.IsActive).ToListAsync();
@@ -1050,7 +1040,7 @@ namespace ForestProtectionForce.Controllers
         }
 
         [HttpPut("PostComplaintsRegistered")]
-        public async Task<IActionResult> UpdateComplaintsRegistered(int id, Complaints_Registered complaints)
+        public async Task<IActionResult> PostComplaintsRegistered(int id, Complaints_Registered complaints)
         {
             if (id == 0) // id = 0 means insertion 
             {
@@ -1155,7 +1145,7 @@ namespace ForestProtectionForce.Controllers
         // Anti-Poching Form A
        
         [HttpGet("CheckAntiPochingAlreadyExistForDistrictAndMonth")]
-        public async Task<ActionResult<IEnumerable<AntiPochingFormA>>> CheckAntiPochingFormAAlreadyExistForDistrictAndMonth(int id, int month = 0)
+        public async Task<ActionResult<IEnumerable<AntiPochingFormA>>> CheckAntiPochingAlreadyExistForDistrictAndMonth(int id, int month = 0)
         {
             month = month == 0 ? DateTime.Now.Month : month;
             var formC = await _context.AntiPochingFormA.Where(x => x.DistrictId == id && x.Month == month && x.Year == DateTime.Now.Year && x.IsActive).ToListAsync();
@@ -1217,7 +1207,7 @@ namespace ForestProtectionForce.Controllers
         // Anti-Poching Form B
 
         [HttpGet("CheckAntiPochingBAlreadyExistForDistrictAndMonth")]
-        public async Task<ActionResult<IEnumerable<AntiPochingFormB>>> CheckAntiPochingFormBAlreadyExistForDistrictAndMonth(int id, int month = 0)
+        public async Task<ActionResult<IEnumerable<AntiPochingFormB>>> CheckAntiPochingBAlreadyExistForDistrictAndMonth(int id, int month = 0)
         {
             month = month == 0 ? DateTime.Now.Month : month;
             var formC = await _context.AntiPochingFormB.Where(x => x.DistrictId == id && x.Month == month && x.Year == DateTime.Now.Year && x.IsActive).ToListAsync();
@@ -1279,7 +1269,7 @@ namespace ForestProtectionForce.Controllers
         // Anti-Poching Form C
 
         [HttpGet("CheckAntiPochingCAlreadyExistForDistrictAndMonth")]
-        public async Task<ActionResult<IEnumerable<AntiPochingFormC>>> CheckAntiPochingFormCAlreadyExistForDistrictAndMonth(int id, int month = 0)
+        public async Task<ActionResult<IEnumerable<AntiPochingFormC>>> CheckAntiPochingCAlreadyExistForDistrictAndMonth(int id, int month = 0)
         {
             month = month == 0 ? DateTime.Now.Month : month;
             var formC = await _context.AntiPochingFormC.Where(x => x.DistrictId == id && x.Month == month && x.Year == DateTime.Now.Year && x.IsActive).ToListAsync();

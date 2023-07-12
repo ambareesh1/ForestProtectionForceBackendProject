@@ -1,4 +1,6 @@
-﻿namespace ForestProtectionForce.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace ForestProtectionForce.Models
 {
     public partial class UserDetails
     {
@@ -8,7 +10,8 @@
         public int ProvinceId { get; set; }
         public int CircleId { get; set; }
         public int DistrictId { get; set; }
-
+        [NotMapped]
+        public string? DistrictName { get; set; }
         public string? UserType_Name { get; set; }
         public string? Username { get; set; }
         public string? Password { get; set; }
