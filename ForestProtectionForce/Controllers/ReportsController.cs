@@ -25,14 +25,15 @@ namespace ForestProtectionForce.Controllers
         }
 
         // GET: api/<ReportsController>
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<object>>> Get()
+        [HttpGet("GetFormAReport")]
+        public async Task<ActionResult<IEnumerable<object>>> GetFormAReport(int districtId = 0, int month = 0, int year = 0)
         {
 
             var itemNames = _context.Seizures_Form_A.Select(entry => entry.name).Distinct().ToList();
             var districts = _context.District.Select(entry => entry.Id).Distinct().ToList();
 
-            int currentMonth = DateTime.Now.Month;
+           
+          
 
             var result = new List<Dictionary<string, object>>();
 
@@ -44,11 +45,11 @@ namespace ForestProtectionForce.Controllers
                 foreach (var district in districts)
                 {
                     decimal prevValue = _context.Seizures_Form_A
-                        .Where(entry => entry.month == currentMonth - 1 && entry.name == item && entry.districtId == district)
+                        .Where(entry => (entry.month < month && entry.year == year) && entry.name == item && entry.districtId == district)
                         .Sum(entry => entry.ob_independent + entry.ob_joint);
 
                     decimal durValue = _context.Seizures_Form_A
-                        .Where(entry => entry.month == currentMonth && entry.name == item && entry.districtId == district)
+                        .Where(entry => entry.month == month && entry.name == item && entry.districtId == district)
                         .Sum(entry => entry.ob_independent + entry.ob_joint);
 
                     decimal totalValue = prevValue + durValue;
@@ -71,7 +72,7 @@ namespace ForestProtectionForce.Controllers
         }
 
         [HttpGet("GetGammaUnitFormBReport")]
-        public async Task<ActionResult<IEnumerable<Gamma_unit_form_b>>> GetGammaUnitFormBReport(int districtId = 0, int month = 0)
+        public async Task<ActionResult<IEnumerable<Gamma_unit_form_b>>> GetGammaUnitFormBReport(int districtId = 0, int month = 0, int year = 0)
         {
             try
             {
@@ -93,7 +94,7 @@ namespace ForestProtectionForce.Controllers
         }
 
         [HttpGet("GetGammaUnitFormCReport")]
-        public async Task<ActionResult<IEnumerable<ReportC>>> GetGammaUnitFormCReport(int districtId = 0, int month = 0)
+        public async Task<ActionResult<IEnumerable<ReportC>>> GetGammaUnitFormCReport(int districtId = 0, int month = 0, int year = 0)
         {
             try
             {
@@ -141,7 +142,7 @@ namespace ForestProtectionForce.Controllers
         }
 
         [HttpGet("GetGammaUnitAbstractFormReport")]
-        public async Task<ActionResult<IEnumerable<AbstractMonth>>> GetGammaUnitAbstractFormReport(int districtId = 0, int month = 0)
+        public async Task<ActionResult<IEnumerable<AbstractMonth>>> GetGammaUnitAbstractFormReport(int districtId = 0, int month = 0, int year = 0)
         {
             try
             {
@@ -196,7 +197,7 @@ namespace ForestProtectionForce.Controllers
         }
 
         [HttpGet("GetMonthCFFormReport")]
-        public async Task<ActionResult<IEnumerable<object>>> GetMonthCFFormReport()
+        public async Task<ActionResult<IEnumerable<object>>> GetMonthCFFormReport(int districtId = 0, int month = 0, int year = 0, bool isFinancialYearSelected = false)
         {
             List<AbstractMonth> abstractMonths = new List<AbstractMonth>
             {
@@ -217,10 +218,12 @@ namespace ForestProtectionForce.Controllers
                .Select(entry => new { entry.Id, entry.Name })
                .Distinct()
                .ToList();
-            int currentMonth = DateTime.Now.Month;
+        
 
             var result = new List<CircleData>();
-
+            int currentMonth = DateTime.Now.Month;
+            int previousYear = year;
+            int financialYearStartMonth = 4; // April
             foreach (var circle in circles)
             {
                 var circleName = circle.Name ?? "";
@@ -233,15 +236,37 @@ namespace ForestProtectionForce.Controllers
 
                     foreach (var item in itemNames)
                     {
-                        decimal prevValue = _context.Seizures_Form_A
-                            .Where(entry => entry.month == currentMonth - 1 && entry.name == item && entry.districtId == district.Id)
+                        decimal prevValue = 0.0m;
+                        decimal durValue = 0.0m;
+                        decimal totalValue = 0.0m;
+
+                        if (isFinancialYearSelected)
+                        {
+                             prevValue = _context.Seizures_Form_A
+                            .Where(entry =>
+                                    (entry.year == previousYear && entry.month >= financialYearStartMonth) || // From April of the previous year
+                                    (entry.year == year+1 && entry.month <= currentMonth) // Up to the specified month of the current year
+                                )
                             .Sum(entry => entry.ob_independent + entry.ob_joint);
 
-                        decimal durValue = _context.Seizures_Form_A
-                            .Where(entry => entry.month == currentMonth && entry.name == item && entry.districtId == district.Id)
+                             durValue = _context.Seizures_Form_A
+                                .Where(entry =>
+                                        (entry.year == previousYear && entry.month >= financialYearStartMonth) || // From April of the previous year
+                                        (entry.year == year && entry.month == currentMonth) // Up to the specified month of the current year
+                                    )
+                                .Sum(entry => entry.ob_independent + entry.ob_joint);
+                        }
+                        else
+                        {
+                             prevValue = _context.Seizures_Form_A
+                            .Where(entry => entry.month == month && entry.year == year && entry.name == item && entry.districtId == district.Id)
                             .Sum(entry => entry.ob_independent + entry.ob_joint);
 
-                        decimal totalValue = prevValue + durValue;
+                             durValue = _context.Seizures_Form_A
+                                .Where(entry => entry.month == month && entry.year == year && entry.name == item && entry.districtId == district.Id)
+                                .Sum(entry => entry.ob_independent + entry.ob_joint);
+                        }
+                        
 
                         districtData.Items.Add(item, prevValue);
                         districtData.Items.Add(item + "_Current", durValue);

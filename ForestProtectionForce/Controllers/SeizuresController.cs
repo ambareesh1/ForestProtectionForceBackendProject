@@ -2,6 +2,9 @@
 using ForestProtectionForce.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualBasic;
+using System.Collections.Generic;
+using System.Linq;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -29,14 +32,25 @@ namespace ForestProtectionForce.Controllers
                 {
                     return NotFound();
                 }
-                return await _context.Seizures_Form_A.ToListAsync();
+                var data = await _context.Seizures_Form_A.ToListAsync();
+                var formA_names = FormA_names();
+                foreach (var item in formA_names)
+                {
+                    decimal obIndependentSum = _context.Seizures_Form_A
+                      .Where(x => x.name == item.Name && x.month <= 0 && x.year == 0)
+                      .Sum(x => x.during_month_independent);
+                    decimal obJointSum = _context.Seizures_Form_A
+                         .Where(x => x.name == item.Name && x.month <= 0 && x.year == 0)
+                         .Sum(x => x.during_month_joint);
+                }
+                return data;
             } catch (Exception ex) {
                 return null;
             }
 
         }
         [HttpGet("GetFormAWithDistrict")]
-        public async Task<ActionResult<IEnumerable<Seizures_Form_A>>> GetFormAOnDistrict(int id, int month = 0)
+        public async Task<ActionResult<IEnumerable<Seizures_Form_A>>> GetFormAOnDistrict(int id, int month = 0, int year = 0)
         {
             try
             {
@@ -45,7 +59,30 @@ namespace ForestProtectionForce.Controllers
                     return NotFound();
                 }
                 month = month == 0 ? DateTime.Now.Month : month;
-                return await _context.Seizures_Form_A.Where(x=>x.districtId == id && x.month == month).ToListAsync();
+                year = year == 0 ? DateTime.Now.Year : year;
+                var data = await _context.Seizures_Form_A.Where(x => x.districtId == id && x.month == month).ToListAsync();
+                var formA_names = FormA_names();
+                foreach (var item in formA_names)
+                {
+                    decimal obIndependentSum =  _context.Seizures_Form_A
+                      .Where(x => x.name == item.Name && x.month < month && x.year == year)
+                      .Sum(x => x.during_month_independent);
+                    decimal obJointSum = _context.Seizures_Form_A
+                         .Where(x => x.name == item.Name && x.month < month && x.year == year)
+                         .Sum(x => x.during_month_joint);
+
+                    // Get the rows that correspond to the current item and update their properties
+                    var rowsToUpdate = data.Where(x => x.name == item.Name).ToList();
+                    foreach (var row in rowsToUpdate)
+                    {
+                        // Update the properties of the row
+                        row.ob_independent = obIndependentSum;
+                        row.ob_joint = obJointSum;
+                    }
+
+                }
+                return data;
+               
             }
             catch (Exception ex)
             {
@@ -146,9 +183,42 @@ namespace ForestProtectionForce.Controllers
         }
 
         [NonAction]
-        public List<Seizures_Form_A> getSeizureReportA(int provinceId, int districtId, int month)
+        public List<Seizures_Form_A> getSeizureReportA(int provinceId, int districtId, int month, int year = 0)
         {
+            year = year == 0 ? DateTime.Now.Year : year;
+           
 
+            List<Seizures_Form_A> seizures_Form_A = new List<Seizures_Form_A>();
+            List<NamesAndSeriaalNo> formA_names = FormA_names();
+            foreach (var item in formA_names)
+            {
+                seizures_Form_A.Add(new Seizures_Form_A
+                {
+                    id = 0,
+                    serialNo = item.SerialNo,
+                    name = item.Name,
+                    ob_independent = 0.00m,
+                    during_month_independent = 0.00m,
+                    total_independent = 0.00m,
+                    ob_joint = 0.00m,
+                    during_month_joint = 0.00m,
+                    total_joint = 0.00m,
+                    provinceId = provinceId,
+                    districtId = districtId,
+                    DateOfInsertion = DateTime.Now,
+                    IsActive = true,
+                    LastUpdatedOn = DateTime.Now,
+                    month = month,
+                    year = DateTime.Now.Year
+                });
+            }
+            return seizures_Form_A;
+
+        }
+
+        [NonAction]
+        public List<NamesAndSeriaalNo> FormA_names()
+        {
             List<NamesAndSeriaalNo> formA_names = new List<NamesAndSeriaalNo>
             {
                         new NamesAndSeriaalNo { SerialNo = "1", Name = "Deodar" },
@@ -191,36 +261,10 @@ namespace ForestProtectionForce.Controllers
                         new NamesAndSeriaalNo { SerialNo = "17", Name = "Planner with motor" },
                         new NamesAndSeriaalNo { SerialNo = "18", Name = "Wooden boat" },
                         new NamesAndSeriaalNo {SerialNo = "19", Name="Hand driven cart/Horse cart"}
-                     
+
 
             };
-
-            List<Seizures_Form_A> seizures_Form_A = new List<Seizures_Form_A>();
-
-            foreach (var item in formA_names)
-            {
-                seizures_Form_A.Add(new Seizures_Form_A
-                {
-                    id = 0,
-                    serialNo = item.SerialNo,
-                    name = item.Name,
-                    ob_independent = 0.00m,
-                    during_month_independent = 0.00m,
-                    total_independent = 0.00m,
-                    ob_joint = 0.00m,
-                    during_month_joint = 0.00m,
-                    total_joint = 0.00m,
-                    provinceId = provinceId,
-                    districtId = districtId,
-                    DateOfInsertion = DateTime.Now,
-                    IsActive = true,
-                    LastUpdatedOn = DateTime.Now,
-                    month = month,
-                    year = DateTime.Now.Year
-                });
-            }
-            return seizures_Form_A;
-
+            return formA_names;
         }
 
         [NonAction]
