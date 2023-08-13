@@ -71,6 +71,12 @@ namespace ForestProtectionForce.Controllers
                          .Where(x => x.name == item.Name && x.month < month && x.year == year)
                          .Sum(x => x.during_month_joint);
 
+                    decimal ob_total = (_context.Seizures_Form_A
+                                      .FirstOrDefault(x => x.name == item.Name && x.month == month && x.year == year)
+                                      ?.during_month_joint ?? 0) + obJointSum;
+
+                    decimal independent_total = (_context.Seizures_Form_A
+                     .FirstOrDefault(x => x.name == item.Name && x.month == month && x.year == year)?.during_month_independent ?? 0) + obIndependentSum;
                     // Get the rows that correspond to the current item and update their properties
                     var rowsToUpdate = data.Where(x => x.name == item.Name).ToList();
                     foreach (var row in rowsToUpdate)
@@ -78,6 +84,8 @@ namespace ForestProtectionForce.Controllers
                         // Update the properties of the row
                         row.ob_independent = obIndependentSum;
                         row.ob_joint = obJointSum;
+                        row.total_joint = ob_total;
+                        row.total_independent = independent_total;
                     }
 
                 }
@@ -495,7 +503,7 @@ namespace ForestProtectionForce.Controllers
                 Id = 0,
                 Activity = "Jungle Gasht/Aabhi Gasht",
                 Details = "",
-                Unit = "No",
+                Unit = 0,
                 DateOfInsertion = DateTime.Now,
                 DistrictId = districtId,
                 ProvinceId = provinceId,
@@ -513,7 +521,7 @@ namespace ForestProtectionForce.Controllers
                 Id = 0,
                 Activity = "Vehicle/Vessel Checking",
                 Details = "",
-                Unit = "No",
+                Unit = 0,
                 DateOfInsertion = DateTime.Now,
                 DistrictId = districtId,
                 ProvinceId = provinceId,
@@ -531,7 +539,7 @@ namespace ForestProtectionForce.Controllers
                 Id = 0,
                 Activity = "Houses/Buildings Search (with details)",
                 Details = "",
-                Unit = "No",
+                Unit =0,
                 DateOfInsertion = DateTime.Now,
                 DistrictId = districtId,
                 ProvinceId = provinceId,
@@ -550,7 +558,7 @@ namespace ForestProtectionForce.Controllers
                 Id = 0,
                 Activity = "Foot Patroling (with details of location)",
                 Details = "",
-                Unit = "Kms",
+                Unit = 0,
                 DateOfInsertion = DateTime.Now,
                 DistrictId = districtId,
                 ProvinceId = provinceId,
@@ -568,7 +576,7 @@ namespace ForestProtectionForce.Controllers
                 Id = 0,
                 Activity = "Vehicle Patroling (with details of location)",
                 Details = "",
-                Unit = "Kms",
+                Unit = 0,
                 DateOfInsertion = DateTime.Now,
                 DistrictId = districtId,
                 ProvinceId = provinceId,
@@ -586,7 +594,7 @@ namespace ForestProtectionForce.Controllers
                 Id = 0,
                 Activity = "Naka (with details of location)",
                 Details = "",
-                Unit = "Kms",
+                Unit = 0,
                 DateOfInsertion = DateTime.Now,
                 DistrictId = districtId,
                 ProvinceId = provinceId,
@@ -612,7 +620,7 @@ namespace ForestProtectionForce.Controllers
                 Id = 0,
                 Article = "Boat",
                 Details = "",
-                Unit = "No",
+                Unit = 0,
                 DateOfInsertion = DateTime.Now,
                 DistrictId = districtId,
                 ProvinceId = provinceId,
@@ -630,7 +638,7 @@ namespace ForestProtectionForce.Controllers
                 Id = 0,
                 Article = "Gun (Type)",
                 Details = "",
-                Unit = "No",
+                Unit = 0,
                 DateOfInsertion = DateTime.Now,
                 DistrictId = districtId,
                 ProvinceId = provinceId,
@@ -648,7 +656,7 @@ namespace ForestProtectionForce.Controllers
                 Id = 0,
                 Article = "Decoys",
                 Details = "",
-                Unit = "No",
+                Unit = 0,
                 DateOfInsertion = DateTime.Now,
                 DistrictId = districtId,
                 ProvinceId = provinceId,
@@ -667,7 +675,7 @@ namespace ForestProtectionForce.Controllers
                 Id = 0,
                 Article = "Vehicles",
                 Details = "",
-                Unit = "No",
+                Unit = 0,
                 DateOfInsertion = DateTime.Now,
                 DistrictId = districtId,
                 ProvinceId = provinceId,
@@ -685,7 +693,7 @@ namespace ForestProtectionForce.Controllers
                 Id = 0,
                 Article = "Carcass (Scheduled Animal)",
                 Details = "",
-                Unit = "No",
+                Unit = 0,
                 DateOfInsertion = DateTime.Now,
                 DistrictId = districtId,
                 ProvinceId = provinceId,
@@ -703,7 +711,7 @@ namespace ForestProtectionForce.Controllers
                 Id = 0,
                 Article = "Trophy, Hide, Nail, Fur, Glands etc",
                 Details = "",
-                Unit = "No",
+                Unit = 0,
                 DateOfInsertion = DateTime.Now,
                 DistrictId = districtId,
                 ProvinceId = provinceId,
@@ -721,7 +729,7 @@ namespace ForestProtectionForce.Controllers
                 Id = 0,
                 Article = "Any Other article (Please specify)",
                 Details = "",
-                Unit = "No",
+                Unit = 0,
                 DateOfInsertion = DateTime.Now,
                 DistrictId = districtId,
                 ProvinceId = provinceId,

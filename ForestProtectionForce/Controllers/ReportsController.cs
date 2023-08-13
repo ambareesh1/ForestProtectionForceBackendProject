@@ -26,31 +26,48 @@ namespace ForestProtectionForce.Controllers
 
         // GET: api/<ReportsController>
         [HttpGet("GetFormAReport")]
-        public async Task<ActionResult<IEnumerable<object>>> GetFormAReport(int districtId = 0, int month = 0, int year = 0)
+        public async Task<ActionResult<IEnumerable<object>>> GetFormAReport(int districtId = 0, int month = 0, int year = 0, bool isJoint = true)
         {
 
             var itemNames = _context.Seizures_Form_A.Select(entry => entry.name).Distinct().ToList();
-            var districts = _context.District.Select(entry => entry.Id).Distinct().ToList();
-
-           
-          
-
+            var districts = _context.District.Select(entry => entry.Id).Distinct().OrderByDescending(x=>x).ToList();
             var result = new List<Dictionary<string, object>>();
-
 
             foreach (var item in itemNames)
             {
                 var row = new Dictionary<string, object> { { "Item", item } };
-
+                decimal prevValue = 0.00m;
+                decimal durValue = 0.00m;
                 foreach (var district in districts)
                 {
-                    decimal prevValue = _context.Seizures_Form_A
+                     prevValue = isJoint ?  _context.Seizures_Form_A
                         .Where(entry => (entry.month < month && entry.year == year) && entry.name == item && entry.districtId == district)
-                        .Sum(entry => entry.ob_independent + entry.ob_joint);
+                        .Sum(entry =>  entry.ob_joint) :
+                         _context.Seizures_Form_A
+                        .Where(entry => (entry.month < month && entry.year == year) && entry.name == item && entry.districtId == district)
+                        .Sum(entry => entry.ob_independent);
 
-                    decimal durValue = _context.Seizures_Form_A
+                     durValue = isJoint ? _context.Seizures_Form_A
                         .Where(entry => entry.month == month && entry.name == item && entry.districtId == district)
-                        .Sum(entry => entry.ob_independent + entry.ob_joint);
+                        .Sum(entry =>  entry.ob_joint) : _context.Seizures_Form_A
+                        .Where(entry => entry.month == month && entry.name == item && entry.districtId == district)
+                        .Sum(entry => entry.ob_independent );
+
+                    if(districtId != 0)
+                    {
+                        prevValue = isJoint ? _context.Seizures_Form_A
+                       .Where(entry => (entry.month < month && entry.year == year) && entry.name == item && entry.districtId == districtId)
+                       .Sum(entry => entry.ob_joint) :
+                        _context.Seizures_Form_A
+                       .Where(entry => (entry.month < month && entry.year == year) && entry.name == item && entry.districtId == districtId)
+                       .Sum(entry => entry.ob_independent);
+
+                        durValue = isJoint ? _context.Seizures_Form_A
+                           .Where(entry => entry.month == month && entry.name == item && entry.districtId == districtId)
+                           .Sum(entry => entry.ob_joint) : _context.Seizures_Form_A
+                           .Where(entry => entry.month == month && entry.name == item && entry.districtId == districtId)
+                           .Sum(entry => entry.ob_independent);
+                    }
 
                     decimal totalValue = prevValue + durValue;
 
@@ -141,49 +158,92 @@ namespace ForestProtectionForce.Controllers
 
         }
 
-        [HttpGet("GetGammaUnitAbstractFormReport")]
-        public async Task<ActionResult<IEnumerable<AbstractMonth>>> GetGammaUnitAbstractFormReport(int districtId = 0, int month = 0, int year = 0)
+        [HttpPost("GetGammaUnitAbstractFormReport")]
+        public async Task<ActionResult<IEnumerable<AbstractMonth>>> GetGammaUnitAbstractFormReport([FromBody] RequestModel requestModel)
         {
             try
             {
+                List< AbstractMonth> result = new();
+                List<AbstractMonth> abstractMonths = new List<AbstractMonth>();
+                int currentMonth = DateTime.Now.Month;
+                int previousYear = requestModel.Year;
+                int financialYearStartMonth = 4; // April
+                int financialYearEndMonth = 3;
 
-                List<AbstractMonth> abstractMonths = new List<AbstractMonth>
+                foreach (var item in requestModel.SelectedOptions)
                 {
-                    new AbstractMonth { Header = "Total Seizures (F/K/D)", Field = "", Cft = "Cft/Qtls" },
-                    new AbstractMonth { Header = "Willow", Field = "Willow", Cft = "No" },
-                    new AbstractMonth { Header = "Vehicles", Field = "Seizure of vehicles (Nos )", Cft = "No" },
-                    new AbstractMonth { Header = "Horses/Ponies", Field = "Seizure of Horses/Pones", Cft = "No" },
-                    new AbstractMonth { Header = "Fire wood", Field = "Fire wood (in Qtis)", Cft = "Qtls" },
-                    new AbstractMonth { Header = "Charcoal", Field = "Charcoal", Cft = "Bags" },
-                    new AbstractMonth { Header = "Eviction of encroachment", Field = "Eviction of encroachments (Kanals)", Cft = "Kanals" },
-                    new AbstractMonth { Header = "Dismentlling of Saw Mills", Field = "Dismentilling of illigal band saw mills", Cft = "No" },
-                    new AbstractMonth { Header = "Poles of diff. Species", Field = "Poles Of Cheer, conifer others (Kiker) Nos", Cft = "No" },
-                    new AbstractMonth { Header = "Forest Area Saved from Fire", Field = "Forest area saved from fire", Cft = "Kanals" },
-                    new AbstractMonth {Header = "MFP", Field = "MFP Seized", Cft="Kgs"}
+                    abstractMonths.Add(new AbstractMonth { Header = item, Field = item, Cft = "" });
+                }
 
-                };
+                if(requestModel.TypeOfSelection == "month")
+                {
+                     result = abstractMonths
+                             .Join(_context.Seizures_Form_A,
+                                 abstractForm => abstractForm.Field,
+                                 entry => entry.name,
+                                 (abstractForm, entry) => new AbstractMonth
+                                 {
+                                     Header = abstractForm.Header,
+                                     Field = entry.name,
+                                     Cft = abstractForm.Cft,
+                                     Prev = _context.Seizures_Form_A
+                                         .Where(e => e.month < requestModel.Month && e.name == entry.name)
+                                         .Sum(e => e.ob_joint + e.total_joint),
+                                     Current = _context.Seizures_Form_A
+                                         .Where(e => e.month == requestModel.Month  && e.name == entry.name)
+                                         .Sum(e => e.ob_joint + e.total_joint)
+                                 }).ToList();
+                }
+                else if(requestModel.TypeOfSelection == "calendaryear")
+                {
+                    result = abstractMonths
+                             .Join(_context.Seizures_Form_A,
+                                 abstractForm => abstractForm.Field,
+                                 entry => entry.name,
+                                 (abstractForm, entry) => new AbstractMonth
+                                 {
+                                     Header = abstractForm.Header,
+                                     Field = entry.name,
+                                     Cft = abstractForm.Cft,
+                                     Prev = _context.Seizures_Form_A
+                                         .Where(e => e.year < requestModel.Year && e.name == entry.name)
+                                         .Sum(e => e.ob_joint + e.total_joint),
+                                     Current = _context.Seizures_Form_A
+                                         .Where(e => e.year == requestModel.Year && e.name == entry.name)
+                                         .Sum(e => e.ob_joint + e.total_joint)
+                                 }).ToList();
+                }
+                else
+                {
+                     result = abstractMonths
+                             .Join(_context.Seizures_Form_A,
+                                 abstractForm => abstractForm.Field,
+                                 entry => entry.name,
+                                 (abstractForm, entry) => new AbstractMonth
+                                 {
+                                     Header = abstractForm.Header,
+                                     Field = entry.name,
+                                     Cft = abstractForm.Cft,
+                                     Prev = _context.Seizures_Form_A
+                                        .Where(e =>
+                                        (e.year == previousYear-1 && e.month >= financialYearStartMonth) || 
+                                        (e.year == requestModel.Year-1 && e.month == financialYearEndMonth) && e.name == entry.name
+                                    ).Sum(e => e.ob_joint + e.total_joint),
 
-                var result = abstractMonths
-                              .Join(_context.Seizures_Form_A,
-                                  abstractForm => abstractForm.Field,
-                                  entry => entry.name,
-                                  (abstractForm, entry) => new AbstractMonth
-                                  {
-                                      Header = abstractForm.Header,
-                                      Field = entry.name,
-                                      Cft = abstractForm.Cft,
-                                      Prev = _context.Seizures_Form_A
-                                          .Where(e => e.month == month && e.name == entry.name)
-                                          .Sum(e => e.ob_joint + e.total_joint),
-                                      Current = _context.Seizures_Form_A
-                                          .Where(e => e.month == month + 1 && e.name == entry.name)
-                                          .Sum(e => e.ob_joint + e.total_joint)
-                                  }).ToList();
+                                     Current = _context.Seizures_Form_A
+                                         .Where(e =>
+                                        (e.year == previousYear && e.month >= financialYearStartMonth) ||
+                                        (e.year == requestModel.Year+1 && e.month == financialYearEndMonth) && e.name == entry.name)
+                                         .Sum(e => e.ob_joint + e.total_joint)
+                                 }).ToList();
+                }
+
+               
 
                 decimal cumulativeSum = 0;
                 foreach (var item in result.Distinct())
                 {
-                    cumulativeSum += item.Current ?? 0;
+                    cumulativeSum = (decimal)(item.Current + item.Prev);
                     item.Cumulative = cumulativeSum;
                 }
 
@@ -196,8 +256,17 @@ namespace ForestProtectionForce.Controllers
             }
         }
 
+        [HttpGet("GetItemNamesFromSeizureA")]
+
+        public async Task<ActionResult<List<string>>> GetItemsFromSeizureA()
+        {
+            List<string?> result = await _context.Seizures_Form_A?.Select(x => x.name).Distinct().ToListAsync();
+            return result;
+        }
+
+
         [HttpGet("GetMonthCFFormReport")]
-        public async Task<ActionResult<IEnumerable<object>>> GetMonthCFFormReport(int districtId = 0, int month = 0, int year = 0, bool isFinancialYearSelected = false)
+        public async Task<ActionResult<IEnumerable<object>>> GetMonthCFFormReport(int districtId = 0, int month = 0, int year = 0, bool isFinancialYearSelected = false, string typeOfSelection = "month")
         {
             List<AbstractMonth> abstractMonths = new List<AbstractMonth>
             {
@@ -240,31 +309,41 @@ namespace ForestProtectionForce.Controllers
                         decimal durValue = 0.0m;
                         decimal totalValue = 0.0m;
 
-                        if (isFinancialYearSelected)
+                        if (typeOfSelection == "financialyear")
                         {
                              prevValue = _context.Seizures_Form_A
                             .Where(entry =>
                                     (entry.year == previousYear && entry.month >= financialYearStartMonth) || // From April of the previous year
                                     (entry.year == year+1 && entry.month <= currentMonth) // Up to the specified month of the current year
                                 )
-                            .Sum(entry => entry.ob_independent + entry.ob_joint);
+                            .Sum(entry =>  entry.ob_joint);
 
                              durValue = _context.Seizures_Form_A
                                 .Where(entry =>
                                         (entry.year == previousYear && entry.month >= financialYearStartMonth) || // From April of the previous year
                                         (entry.year == year && entry.month == currentMonth) // Up to the specified month of the current year
                                     )
-                                .Sum(entry => entry.ob_independent + entry.ob_joint);
+                                .Sum(entry =>  entry.ob_joint);
+                        }
+                        else if (typeOfSelection == "calendaryear")
+                        {
+                            prevValue = _context.Seizures_Form_A
+                           .Where(entry =>  entry.year < year && entry.name == item && entry.districtId == district.Id)
+                           .Sum(entry => entry.ob_joint);
+
+                            durValue = _context.Seizures_Form_A
+                               .Where(entry =>  entry.year == year && entry.name == item && entry.districtId == district.Id)
+                               .Sum(entry => entry.ob_joint);
                         }
                         else
                         {
                              prevValue = _context.Seizures_Form_A
                             .Where(entry => entry.month == month && entry.year == year && entry.name == item && entry.districtId == district.Id)
-                            .Sum(entry => entry.ob_independent + entry.ob_joint);
+                            .Sum(entry =>  entry.ob_joint);
 
                              durValue = _context.Seizures_Form_A
                                 .Where(entry => entry.month == month && entry.year == year && entry.name == item && entry.districtId == district.Id)
-                                .Sum(entry => entry.ob_independent + entry.ob_joint);
+                                .Sum(entry =>  entry.ob_joint);
                         }
                         
 
@@ -380,12 +459,12 @@ namespace ForestProtectionForce.Controllers
     }
     public class CircleData
     {
-        public string Circle { get; set; }
+        public string? Circle { get; set; }
         public List<DistrictData> Districts { get; set; }
     }
     public class DistrictData
     {
-        public string District { get; set; }
+        public string? District { get; set; }
         public Dictionary<string, decimal> Items { get; set; }
     }
     public enum DataType
@@ -400,5 +479,14 @@ namespace ForestProtectionForce.Controllers
         public decimal Previous { get; set; }
         public decimal Current { get; set; }
         public decimal Cumulative { get; set; }
+    }
+
+    public class RequestModel
+    {
+        public int DistrictId { get; set; }
+        public int Month { get; set; }
+        public int Year { get; set; }
+        public List<string>? SelectedOptions { get; set; }
+        public string? TypeOfSelection { get; set; } 
     }
 }

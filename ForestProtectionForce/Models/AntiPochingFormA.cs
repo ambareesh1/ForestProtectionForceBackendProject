@@ -5,7 +5,7 @@
         public int Id { get; set; }
         public int Sno { get; set; }
         public string? Activity { get; set; }
-        public string? Unit { get; set; }
+        public int Unit { get; set; }
         public string? Details { get; set; }
         public int ProvinceId { get; set; }
         public int DistrictId { get; set; }
