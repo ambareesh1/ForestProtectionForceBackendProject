@@ -11,6 +11,7 @@ using ForestProtectionForce.Services;
 using Microsoft.Extensions.Options;
 using ForestProtectionForce.utilities;
 using System.Linq.Expressions;
+using Microsoft.CodeAnalysis.Operations;
 
 namespace ForestProtectionForce.Controllers
 {
@@ -44,13 +45,13 @@ namespace ForestProtectionForce.Controllers
 
         // GET: api/Baselines/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Baseline>> GetBaseline(int id)
+        public async Task<ActionResult<Baseline>> GetBaseline(string id)
         {
           if (_context.Baseline == null)
           {
-              return NotFound();
+                return NotFound();
           }
-            var baseline = await _context.Baseline.FindAsync(id);
+            var baseline = await _context.Baseline.FirstOrDefaultAsync(x => x.CaseNo == id);
 
             if (baseline == null)
             {
