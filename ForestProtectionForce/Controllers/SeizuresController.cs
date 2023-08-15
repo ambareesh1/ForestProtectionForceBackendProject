@@ -65,18 +65,18 @@ namespace ForestProtectionForce.Controllers
                 foreach (var item in formA_names)
                 {
                     decimal obIndependentSum =  _context.Seizures_Form_A
-                      .Where(x => x.name == item.Name && x.month < month && x.year == year)
+                      .Where(x => x.name == item.Name && x.month < month && x.year == year && x.districtId == id)
                       .Sum(x => x.during_month_independent);
                     decimal obJointSum = _context.Seizures_Form_A
-                         .Where(x => x.name == item.Name && x.month < month && x.year == year)
+                         .Where(x => x.name == item.Name && x.month < month && x.year == year && x.districtId == id)
                          .Sum(x => x.during_month_joint);
 
                     decimal ob_total = (_context.Seizures_Form_A
-                                      .FirstOrDefault(x => x.name == item.Name && x.month == month && x.year == year)
+                                      .FirstOrDefault(x => x.name == item.Name && x.month == month && x.year == year && x.districtId == id)
                                       ?.during_month_joint ?? 0) + obJointSum;
 
                     decimal independent_total = (_context.Seizures_Form_A
-                     .FirstOrDefault(x => x.name == item.Name && x.month == month && x.year == year)?.during_month_independent ?? 0) + obIndependentSum;
+                     .FirstOrDefault(x => x.name == item.Name && x.month == month && x.year == year && x.districtId == id)?.during_month_independent ?? 0) + obIndependentSum;
                     // Get the rows that correspond to the current item and update their properties
                     var rowsToUpdate = data.Where(x => x.name == item.Name).ToList();
                     foreach (var row in rowsToUpdate)
