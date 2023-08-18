@@ -163,10 +163,11 @@ namespace ForestProtectionForce.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Seizures_Form_A>> CheckSeizureAlreadyExistForDistrictAndMonth(int id, int month = 0)
+        public async Task<ActionResult<Seizures_Form_A>> CheckSeizureAlreadyExistForDistrictAndMonth(int id, int month = 0, int year = 0)
         {
             month = month == 0 ? DateTime.Now.Month : month;
-            Seizures_Form_A? formA = await _context.Seizures_Form_A.FirstOrDefaultAsync(x => x.districtId == id && x.month == month && x.year == DateTime.Now.Year);
+            year = year == 0 ? DateTime.Now.Year : year;
+            Seizures_Form_A? formA = await _context.Seizures_Form_A.FirstOrDefaultAsync(x => x.districtId == id && x.month == month && x.year == year);
 
             if (formA == null)
             {
@@ -176,15 +177,7 @@ namespace ForestProtectionForce.Controllers
             return formA;
         }
 
-        [NonAction]
-        public bool checkTheCurrentMonthAndYear()
-        {
-            var result = _context.Seizures_Form_A?.LastOrDefault();
-
-            return result?.month == DateTime.Now.Month && result.year == DateTime.Now.Year;
-
-        }
-
+        
         private bool FormAExists(int id)
         {
             return (_context.Seizures_Form_A?.Any(e => e.id == id)).GetValueOrDefault();
@@ -217,7 +210,7 @@ namespace ForestProtectionForce.Controllers
                     IsActive = true,
                     LastUpdatedOn = DateTime.Now,
                     month = month,
-                    year = DateTime.Now.Year
+                    year =year
                 });
             }
             return seizures_Form_A;
@@ -276,7 +269,7 @@ namespace ForestProtectionForce.Controllers
         }
 
         [NonAction]
-        public Gamma_unit_form_b getSeizureGammaUnitB(int provinceId, int districtId, int month)
+        public Gamma_unit_form_b getSeizureGammaUnitB(int provinceId, int districtId, int month, int year)
         {
             Gamma_unit_form_b formB = new Gamma_unit_form_b
             {
@@ -288,7 +281,7 @@ namespace ForestProtectionForce.Controllers
                 IsActive = true,
                 LastUpdatedOn = DateTime.Now,
                 Month = month,
-                Year = DateTime.Now.Year,
+                Year = year,
                 Gamma_Unit = "",
                 JOP_Reports_Received = 0,
                 Jungle_Gashts_Performed = 0,
@@ -304,7 +297,7 @@ namespace ForestProtectionForce.Controllers
         }
 
         [NonAction]
-        public List<Seizure_CasesMonth_Form_C> getSeizureCasesOfMonthC(int? provinceId, int? districtId, int month)
+        public List<Seizure_CasesMonth_Form_C> getSeizureCasesOfMonthC(int? provinceId, int? districtId, int month, int year)
         {
             List<Seizure_CasesMonth_Form_C> formC = new List<Seizure_CasesMonth_Form_C>{
                 new Seizure_CasesMonth_Form_C
@@ -315,7 +308,7 @@ namespace ForestProtectionForce.Controllers
                 IsActive = true,
                 LastUpdatedOn = DateTime.Now,
                 Month = month,
-                Year = DateTime.Now.Year,
+                Year = year,
                 Authorized_Officer_FD = 0,
                 Balance = 0,
                 Cases_Registered_Month = 0,
@@ -339,7 +332,7 @@ namespace ForestProtectionForce.Controllers
                 IsActive = true,
                 LastUpdatedOn = DateTime.Now,
                 Month = month,
-                Year = DateTime.Now.Year,
+                Year = year,
                 Authorized_Officer_FD = 0,
                 Balance = 0,
                 Cases_Registered_Month = 0,
@@ -362,7 +355,7 @@ namespace ForestProtectionForce.Controllers
                 IsActive = true,
                 LastUpdatedOn = DateTime.Now,
                 Month =month,
-                Year = DateTime.Now.Year,
+                Year = year,
                 Authorized_Officer_FD = 0,
                 Balance = 0,
                 Cases_Registered_Month = 0,
@@ -386,7 +379,7 @@ namespace ForestProtectionForce.Controllers
         }
 
         [NonAction]
-        public seizure_man_animal_conflict ManAnimalConflict(int provinceId, int districtId, int month)
+        public seizure_man_animal_conflict ManAnimalConflict(int provinceId, int districtId, int month, int year)
         {
             seizure_man_animal_conflict seizure_Man_Animal_Conflict = new seizure_man_animal_conflict
             {
@@ -400,7 +393,7 @@ namespace ForestProtectionForce.Controllers
                 IsActive = true,
                 LastUpdatedOn = DateTime.Now,
                 Month =month,
-                Year = DateTime.Now.Year,
+                Year = year,
                 SNo = 1
             };
 
@@ -409,7 +402,7 @@ namespace ForestProtectionForce.Controllers
         }
 
         [NonAction]
-        public ForestFire FirestFireAdd(int provinceId, int districtId, int month)
+        public ForestFire FirestFireAdd(int provinceId, int districtId, int month, int year)
         {
             ForestFire forestFire = new ()
             {
@@ -429,7 +422,7 @@ namespace ForestProtectionForce.Controllers
                 is_active = true,
                 last_updated_on = DateTime.Now,
                 month = month,
-                year = DateTime.Now.Year,
+                year = year,
                 sno = 1
             };
 
@@ -439,7 +432,7 @@ namespace ForestProtectionForce.Controllers
 
 
         [NonAction]
-        public Complaints_Registered ComplaintsRegisteredAdd(int provinceId, int districtId, int month)
+        public Complaints_Registered ComplaintsRegisteredAdd(int provinceId, int districtId, int month, int year)
         {
             Complaints_Registered complaintsRegistered = new()
             {
@@ -460,15 +453,15 @@ namespace ForestProtectionForce.Controllers
                 ProvinceId = provinceId,
                 SourceOfComplaint = "",
                 UpdatedBy = "",
-                Year = DateTime.Now.Year
-                
+                Year = year
+
             };
 
             return complaintsRegistered;
         }
 
         [NonAction]
-        public ForestOffender ForestOffenderAdd(int provinceId, int districtId, int month)
+        public ForestOffender ForestOffenderAdd(int provinceId, int districtId, int month, int year)
         {
             ForestOffender forestOffender = new()
             {
@@ -484,7 +477,7 @@ namespace ForestProtectionForce.Controllers
                 LastUpdatedOn = DateTime.Now,
                 ModusOperandi = "",
                 Month = month,
-                Year = DateTime.Now.Year,
+                Year = year,
                 NameOfForestOffender = "",
                 Sno = 1, 
                 UpdatedBy = ""
@@ -494,7 +487,7 @@ namespace ForestProtectionForce.Controllers
         }
 
         [NonAction]
-        public List<AntiPochingFormA> AntiPochingFormAAdd(int provinceId, int districtId, int month)
+        public List<AntiPochingFormA> AntiPochingFormAAdd(int provinceId, int districtId, int month, int year)
         {
             List<AntiPochingFormA> formA = new List<AntiPochingFormA>{
 
@@ -511,7 +504,7 @@ namespace ForestProtectionForce.Controllers
                 LastUpdatedOn = DateTime.Now,
 
                 Month = month,
-                Year = DateTime.Now.Year,
+                Year = year,
                 Sno = 1,
                 UpdatedBy = ""
             },
@@ -529,7 +522,7 @@ namespace ForestProtectionForce.Controllers
                 LastUpdatedOn = DateTime.Now,
 
                 Month = month,
-                Year = DateTime.Now.Year,
+                Year = year,
                 Sno = 2,
                 UpdatedBy = ""
             },
@@ -547,7 +540,7 @@ namespace ForestProtectionForce.Controllers
                 LastUpdatedOn = DateTime.Now,
 
                 Month = month,
-                Year = DateTime.Now.Year,
+                Year = year,
                 Sno = 3,
                 UpdatedBy = ""
             },
@@ -566,7 +559,7 @@ namespace ForestProtectionForce.Controllers
                 LastUpdatedOn = DateTime.Now,
 
                 Month = month,
-                Year = DateTime.Now.Year,
+                Year = year,
                 Sno = 4,
                 UpdatedBy = ""
             },
@@ -584,7 +577,7 @@ namespace ForestProtectionForce.Controllers
                 LastUpdatedOn = DateTime.Now,
 
                 Month = month,
-                Year = DateTime.Now.Year,
+                Year = year,
                 Sno = 5,
                 UpdatedBy = ""
             },
@@ -602,7 +595,7 @@ namespace ForestProtectionForce.Controllers
                 LastUpdatedOn = DateTime.Now,
 
                 Month = month,
-                Year = DateTime.Now.Year,
+                Year = year,
                 Sno = 6,
                 UpdatedBy = ""
             } };
@@ -611,7 +604,7 @@ namespace ForestProtectionForce.Controllers
 
 
         [NonAction]
-        public List<AntiPochingFormB> AntiPochingFormBAdd(int provinceId, int districtId, int month)
+        public List<AntiPochingFormB> AntiPochingFormBAdd(int provinceId, int districtId, int month, int year)
         {
             List<AntiPochingFormB> formB = new List<AntiPochingFormB>{
 
@@ -628,7 +621,7 @@ namespace ForestProtectionForce.Controllers
                 LastUpdatedOn = DateTime.Now,
 
                 Month = month,
-                Year = DateTime.Now.Year,
+                Year = year,
                 Sno = 1,
                 UpdatedBy = ""
             },
@@ -646,7 +639,7 @@ namespace ForestProtectionForce.Controllers
                 LastUpdatedOn = DateTime.Now,
 
                 Month = month,
-                Year = DateTime.Now.Year,
+                Year = year,
                 Sno = 2,
                 UpdatedBy = ""
             },
@@ -664,7 +657,7 @@ namespace ForestProtectionForce.Controllers
                 LastUpdatedOn = DateTime.Now,
 
                 Month = month,
-                Year = DateTime.Now.Year,
+                Year = year,
                 Sno = 3,
                 UpdatedBy = ""
             },
@@ -683,7 +676,7 @@ namespace ForestProtectionForce.Controllers
                 LastUpdatedOn = DateTime.Now,
 
                 Month = month ,
-                Year = DateTime.Now.Year,
+                Year = year,
                 Sno = 4,
                 UpdatedBy = ""
             },
@@ -701,7 +694,7 @@ namespace ForestProtectionForce.Controllers
                 LastUpdatedOn = DateTime.Now,
 
                 Month = month,
-                Year = DateTime.Now.Year,
+                Year = year,
                 Sno = 5,
                 UpdatedBy = ""
             },
@@ -719,7 +712,7 @@ namespace ForestProtectionForce.Controllers
                 LastUpdatedOn = DateTime.Now,
 
                 Month = month,
-                Year = DateTime.Now.Year,
+                Year = year,
                 Sno = 6,
                 UpdatedBy = ""
             },
@@ -737,7 +730,7 @@ namespace ForestProtectionForce.Controllers
                 LastUpdatedOn = DateTime.Now,
 
                 Month = month ,
-                Year = DateTime.Now.Year,
+                Year = year,
                 Sno = 6,
                 UpdatedBy = ""
             }};
@@ -746,7 +739,7 @@ namespace ForestProtectionForce.Controllers
 
 
         [NonAction]
-        public AntiPochingFormC AntiPochingFormCAdd(int provinceId, int districtId, int month)
+        public AntiPochingFormC AntiPochingFormCAdd(int provinceId, int districtId, int month, int year)
         {
             AntiPochingFormC forestOffender = new()
             {
@@ -760,7 +753,7 @@ namespace ForestProtectionForce.Controllers
                 IsActive = true,
                 LastUpdatedOn = DateTime.Now,
                 Month = month,
-                Year = DateTime.Now.Year,
+                Year = year,
                 Sno = 1,
                 UpdatedBy = ""
             };
@@ -817,7 +810,7 @@ namespace ForestProtectionForce.Controllers
         }
 
         [HttpGet("GetGammaUnitFormBWithDistrict")]
-        public async Task<ActionResult<IEnumerable<Gamma_unit_form_b>>> GetGammaUnitFormBWithDistrict(int districtId, int month = 0)
+        public async Task<ActionResult<IEnumerable<Gamma_unit_form_b>>> GetGammaUnitFormBWithDistrict(int districtId, int month = 0, int year = 0)
         {
             try
             {
@@ -826,7 +819,8 @@ namespace ForestProtectionForce.Controllers
                     return NotFound();
                 }
                 month = month == 0 ? DateTime.Now.Month : month;
-                return await _context.gamma_unit_form_b.Where(x => x.DistrictId == districtId && x.Month == month && x.Year == DateTime.Now.Year).ToListAsync();
+                year = year == 0 ? DateTime.Now.Year : year;
+                return await _context.gamma_unit_form_b.Where(x => x.DistrictId == districtId && x.Month == month && x.Year == year).ToListAsync();
             }
             catch (Exception ex)
             {
@@ -842,17 +836,18 @@ namespace ForestProtectionForce.Controllers
                 return Problem("Entity set 'ForestProtectionForceContext.PostGammaUnitFormB'  is null.");
             }
 
-            Gamma_unit_form_b formB = getSeizureGammaUnitB(seizures_GammaUnit_Form_B.ProvinceId, seizures_GammaUnit_Form_B.DistrictId, seizures_GammaUnit_Form_B.Month);
+            Gamma_unit_form_b formB = getSeizureGammaUnitB(seizures_GammaUnit_Form_B.ProvinceId, seizures_GammaUnit_Form_B.DistrictId, seizures_GammaUnit_Form_B.Month, seizures_GammaUnit_Form_B.Year);
             _context.gamma_unit_form_b.Add(formB);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("Seizures_Form_B", new { id = 1 }, formB);
         }
         [HttpGet("CheckSeizureBlreadyExistForDistrictAndMonth")]
-        public async Task<ActionResult<Gamma_unit_form_b>> CheckSeizureBlreadyExistForDistrictAndMonth(int id, int month = 0)
+        public async Task<ActionResult<Gamma_unit_form_b>> CheckSeizureBlreadyExistForDistrictAndMonth(int id, int month = 0, int year = 0)
         {
             month = month == 0 ? DateTime.Now.Month : month;
-            Gamma_unit_form_b? formA = await _context.gamma_unit_form_b.FirstOrDefaultAsync(x => x.DistrictId == id && x.Month == month && x.Year == DateTime.Now.Year);
+            year = year == 0 ? DateTime.Now.Year : year;
+            Gamma_unit_form_b? formA = await _context.gamma_unit_form_b.FirstOrDefaultAsync(x => x.DistrictId == id && x.Month == month && x.Year == year);
 
             if (formA == null)
             {
@@ -866,10 +861,11 @@ namespace ForestProtectionForce.Controllers
         // FORM C - CASES OF MONTH
 
         [HttpGet("CheckSeizureClreadyExistForDistrictAndMonth")]
-        public async Task<ActionResult<IEnumerable<Seizure_CasesMonth_Form_C>>> CheckSeizureClreadyExistForDistrictAndMonth(int id, int month = 0)
+        public async Task<ActionResult<IEnumerable<Seizure_CasesMonth_Form_C>>> CheckSeizureClreadyExistForDistrictAndMonth(int id, int month = 0, int year = 0)
         {
             month = month == 0 ? DateTime.Now.Month : month;
-            var formC = await _context.status_of_cases_form_c.Where(x => x.DistrictId == id && x.Month == month && x.Year == DateTime.Now.Year && x.IsActive == true).ToListAsync();
+            year = year == 0 ? DateTime.Now.Year : year;
+            var formC = await _context.status_of_cases_form_c.Where(x => x.DistrictId == id && x.Month == month && x.Year == year && x.IsActive == true).ToListAsync();
 
             if (formC == null)
             {
@@ -917,7 +913,7 @@ namespace ForestProtectionForce.Controllers
                 return Problem("Entity set 'ForestProtectionForceContext.seizure_CasesMonth_Form_C'  is null.");
             }
 
-            List<Seizure_CasesMonth_Form_C> formC = getSeizureCasesOfMonthC(seizure_CasesMonth_Form_C.ProvinceId, seizure_CasesMonth_Form_C.DistrictId, seizure_CasesMonth_Form_C.Month??0);
+            List<Seizure_CasesMonth_Form_C> formC = getSeizureCasesOfMonthC(seizure_CasesMonth_Form_C.ProvinceId, seizure_CasesMonth_Form_C.DistrictId, seizure_CasesMonth_Form_C.Month??0, seizure_CasesMonth_Form_C.Year??0);
             _context.status_of_cases_form_c.AddRange(formC);
             await _context.SaveChangesAsync();
           
@@ -929,10 +925,11 @@ namespace ForestProtectionForce.Controllers
 
 
         [HttpGet("CheckManAnimalConflictAlreadyExistForDistrictAndMonth")]
-        public async Task<ActionResult<IEnumerable<seizure_man_animal_conflict>>> CheckManAnimalConflictAlreadyExistForDistrictAndMonth(int id, int month = 0)
+        public async Task<ActionResult<IEnumerable<seizure_man_animal_conflict>>> CheckManAnimalConflictAlreadyExistForDistrictAndMonth(int id, int month = 0, int year = 0)
         {
             month = month == 0 ? DateTime.Now.Month : month;
-            var formC = await _context.seizure_man_animal_conflict.Where(x => x.DistrictId == id && x.Month == month && x.Year == DateTime.Now.Year && x.IsActive).ToListAsync();
+            year = year == 0 ? DateTime.Now.Year : year;
+            var formC = await _context.seizure_man_animal_conflict.Where(x => x.DistrictId == id && x.Month == month && x.Year == year && x.IsActive).ToListAsync();
 
             if (formC == null)
             {
@@ -950,7 +947,7 @@ namespace ForestProtectionForce.Controllers
                 return Problem("Entity set 'ForestProtectionForceContext.seizure_Man_Animal_Conflict'  is null.");
             }
 
-          seizure_man_animal_conflict manAnimalConflicts = ManAnimalConflict(seizure_Man_Animal_Conflicts.ProvinceId??0 , seizure_Man_Animal_Conflicts.DistrictId??0, seizure_Man_Animal_Conflicts.Month);
+          seizure_man_animal_conflict manAnimalConflicts = ManAnimalConflict(seizure_Man_Animal_Conflicts.ProvinceId??0 , seizure_Man_Animal_Conflicts.DistrictId??0, seizure_Man_Animal_Conflicts.Month, seizure_Man_Animal_Conflicts.Year);
             _context.seizure_man_animal_conflict.Add(manAnimalConflicts);
             await _context.SaveChangesAsync();
 
@@ -996,10 +993,11 @@ namespace ForestProtectionForce.Controllers
         // Forest Fire Incident 
 
         [HttpGet("CheckFireIncidentAlreadyExistForDistrictAndMonth")]
-        public async Task<ActionResult<IEnumerable<ForestFire>>> CheckFireIncidentAlreadyExistForDistrictAndMonth(int id, int month = 0)
+        public async Task<ActionResult<IEnumerable<ForestFire>>> CheckFireIncidentAlreadyExistForDistrictAndMonth(int id, int month = 0, int year = 0)
         {
             month = month == 0 ? DateTime.Now.Month : month;
-            var formC = await _context.forest_Fire.Where(x => x.district_id == id && x.month == month && x.year == DateTime.Now.Year && x.is_active).ToListAsync();
+            year = year == 0 ? DateTime.Now.Year : year;
+            var formC = await _context.forest_Fire.Where(x => x.district_id == id && x.month == month && x.year == year && x.is_active).ToListAsync();
 
             if (formC == null)
             {
@@ -1017,7 +1015,7 @@ namespace ForestProtectionForce.Controllers
                 return Problem("Entity set 'ForestProtectionForceContext.ForestFire'  is null.");
             }
 
-            ForestFire forestFireData = FirestFireAdd(forestFire.province_id , forestFire.district_id, forestFire.month );
+            ForestFire forestFireData = FirestFireAdd(forestFire.province_id , forestFire.district_id, forestFire.month, forestFire.year);
             _context.forest_Fire.Add(forestFireData);
             await _context.SaveChangesAsync();
            
@@ -1063,10 +1061,12 @@ namespace ForestProtectionForce.Controllers
         // Complaints Registered 
 
         [HttpGet("CheckComplaintsRegisteredAlreadyExistForDistrictAndMonth")]
-        public async Task<ActionResult<IEnumerable<Complaints_Registered>>> CheckComplaintsRegisteredAlreadyExistForDistrictAndMonth(int id, int month = 0)
+        public async Task<ActionResult<IEnumerable<Complaints_Registered>>> CheckComplaintsRegisteredAlreadyExistForDistrictAndMonth(int id, int month = 0, int year = 0)
         {
+
             month = month == 0 ? DateTime.Now.Month : month;
-            var formC = await _context.complaints_registered.Where(x => x.DistrictId == id && x.Month == month && x.Year == DateTime.Now.Year && x.IsActive).ToListAsync();
+            year = year == 0 ? DateTime.Now.Year : year;
+            var formC = await _context.complaints_registered.Where(x => x.DistrictId == id && x.Month == month && x.Year == year && x.IsActive).ToListAsync();
 
             if (formC == null)
             {
@@ -1084,7 +1084,7 @@ namespace ForestProtectionForce.Controllers
                 return Problem("Entity set 'ForestProtectionForceContext.Complaints_Registereds'  is null.");
             }
 
-            Complaints_Registered complaints = ComplaintsRegisteredAdd(complaints_Registereds.ProvinceId, complaints_Registereds.DistrictId, complaints_Registereds.Month);
+            Complaints_Registered complaints = ComplaintsRegisteredAdd(complaints_Registereds.ProvinceId, complaints_Registereds.DistrictId, complaints_Registereds.Month, complaints_Registereds.Year);
             _context.complaints_registered.Add(complaints);
             await _context.SaveChangesAsync();
 
@@ -1130,10 +1130,11 @@ namespace ForestProtectionForce.Controllers
         // Forest Offenders
 
         [HttpGet("CheckForestOffendersAlreadyExistForDistrictAndMonth")]
-        public async Task<ActionResult<IEnumerable<ForestOffender>>> CheckForestOffendersAlreadyExistForDistrictAndMonth(int id, int month = 0)
+        public async Task<ActionResult<IEnumerable<ForestOffender>>> CheckForestOffendersAlreadyExistForDistrictAndMonth(int id, int month = 0, int year = 0)
         {
             month = month == 0 ? DateTime.Now.Month : month;
-            var formC = await _context.ForestOffenders.Where(x => x.DistrictId == id && x.Month == month && x.Year == DateTime.Now.Year && x.IsActive).ToListAsync();
+            year = year == 0 ? DateTime.Now.Year : year;
+            var formC = await _context.ForestOffenders.Where(x => x.DistrictId == id && x.Month == month && x.Year == year && x.IsActive).ToListAsync();
 
             if (formC == null)
             {
@@ -1151,7 +1152,7 @@ namespace ForestProtectionForce.Controllers
                 return Problem("Entity set 'ForestProtectionForceContext.Forest_Offenders'  is null.");
             }
 
-            ForestOffender forestOffender = ForestOffenderAdd(forestOffenderData.ProvinceId, forestOffenderData.DistrictId, forestOffenderData.Month);
+            ForestOffender forestOffender = ForestOffenderAdd(forestOffenderData.ProvinceId, forestOffenderData.DistrictId, forestOffenderData.Month, forestOffenderData.Year);
             _context.ForestOffenders.Add(forestOffender);
             await _context.SaveChangesAsync();
 
@@ -1197,10 +1198,11 @@ namespace ForestProtectionForce.Controllers
         // Anti-Poching Form A
        
         [HttpGet("CheckAntiPochingAlreadyExistForDistrictAndMonth")]
-        public async Task<ActionResult<IEnumerable<AntiPochingFormA>>> CheckAntiPochingAlreadyExistForDistrictAndMonth(int id, int month = 0)
+        public async Task<ActionResult<IEnumerable<AntiPochingFormA>>> CheckAntiPochingAlreadyExistForDistrictAndMonth(int id, int month = 0, int year = 0)
         {
             month = month == 0 ? DateTime.Now.Month : month;
-            var formC = await _context.AntiPochingFormA.Where(x => x.DistrictId == id && x.Month == month && x.Year == DateTime.Now.Year && x.IsActive).ToListAsync();
+            year = year == 0 ? DateTime.Now.Year : year;
+            var formC = await _context.AntiPochingFormA.Where(x => x.DistrictId == id && x.Month == month && x.Year == year && x.IsActive).ToListAsync();
 
             if (formC == null)
             {
@@ -1218,7 +1220,7 @@ namespace ForestProtectionForce.Controllers
                 return Problem("Entity set 'ForestProtectionForceContext.antiPochingFormA'  is null.");
             }
 
-            List<AntiPochingFormA> antiPochingForm = AntiPochingFormAAdd(antiPochingFormA.ProvinceId, antiPochingFormA.DistrictId, antiPochingFormA.Month);
+            List<AntiPochingFormA> antiPochingForm = AntiPochingFormAAdd(antiPochingFormA.ProvinceId, antiPochingFormA.DistrictId, antiPochingFormA.Month, antiPochingFormA.Year);
             _context.AntiPochingFormA.AddRange(antiPochingForm);
             await _context.SaveChangesAsync();
 
@@ -1259,16 +1261,16 @@ namespace ForestProtectionForce.Controllers
         // Anti-Poching Form B
 
         [HttpGet("CheckAntiPochingBAlreadyExistForDistrictAndMonth")]
-        public async Task<ActionResult<IEnumerable<AntiPochingFormB>>> CheckAntiPochingBAlreadyExistForDistrictAndMonth(int id, int month = 0)
+        public async Task<ActionResult<IEnumerable<AntiPochingFormB>>> CheckAntiPochingBAlreadyExistForDistrictAndMonth(int id, int month = 0, int year = 0)
         {
             month = month == 0 ? DateTime.Now.Month : month;
-            var formC = await _context.AntiPochingFormB.Where(x => x.DistrictId == id && x.Month == month && x.Year == DateTime.Now.Year && x.IsActive).ToListAsync();
+            var formC = await _context.AntiPochingFormB.Where(x => x.DistrictId == id && x.Month == month && x.Year == year && x.IsActive).ToListAsync();
 
             if (formC == null)
             {
                 return null;
             }
-
+            
             return formC;
         }
 
@@ -1280,7 +1282,7 @@ namespace ForestProtectionForce.Controllers
                 return Problem("Entity set 'ForestProtectionForceContext.antiPochingFormB'  is null.");
             }
 
-            List<AntiPochingFormB> antiPochingForm = AntiPochingFormBAdd(antiPochingFormB.ProvinceId, antiPochingFormB.DistrictId, antiPochingFormB.Month);
+            List<AntiPochingFormB> antiPochingForm = AntiPochingFormBAdd(antiPochingFormB.ProvinceId, antiPochingFormB.DistrictId, antiPochingFormB.Month, antiPochingFormB.Year);
             _context.AntiPochingFormB.AddRange(antiPochingForm);
             await _context.SaveChangesAsync();
 
@@ -1321,10 +1323,10 @@ namespace ForestProtectionForce.Controllers
         // Anti-Poching Form C
 
         [HttpGet("CheckAntiPochingCAlreadyExistForDistrictAndMonth")]
-        public async Task<ActionResult<IEnumerable<AntiPochingFormC>>> CheckAntiPochingCAlreadyExistForDistrictAndMonth(int id, int month = 0)
+        public async Task<ActionResult<IEnumerable<AntiPochingFormC>>> CheckAntiPochingCAlreadyExistForDistrictAndMonth(int id, int month = 0, int year = 0)
         {
             month = month == 0 ? DateTime.Now.Month : month;
-            var formC = await _context.AntiPochingFormC.Where(x => x.DistrictId == id && x.Month == month && x.Year == DateTime.Now.Year && x.IsActive).ToListAsync();
+            var formC = await _context.AntiPochingFormC.Where(x => x.DistrictId == id && x.Month == month && x.Year == year && x.IsActive).ToListAsync();
 
             if (formC == null)
             {
@@ -1342,7 +1344,7 @@ namespace ForestProtectionForce.Controllers
                 return Problem("Entity set 'ForestProtectionForceContext.antiPochingFormC'  is null.");
             }
 
-            AntiPochingFormC antiPochingForm = AntiPochingFormCAdd(antiPochingFormC.ProvinceId, antiPochingFormC.DistrictId, antiPochingFormC.Month);
+            AntiPochingFormC antiPochingForm = AntiPochingFormCAdd(antiPochingFormC.ProvinceId, antiPochingFormC.DistrictId, antiPochingFormC.Month, antiPochingFormC.Year);
             _context.AntiPochingFormC.Add(antiPochingForm);
             await _context.SaveChangesAsync();
 

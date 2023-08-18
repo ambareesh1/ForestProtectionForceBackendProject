@@ -292,7 +292,11 @@ namespace ForestProtectionForce.Controllers
             var result = new List<CircleData>();
             int currentMonth = DateTime.Now.Month;
             int previousYear = year;
+            int currentYear = year + 1;
             int financialYearStartMonth = 4; // April
+            int financialYearEndMonth = 3;
+            int prePreviousYear = previousYear - 1;
+            int preCurrentYear = currentYear - 1;
             foreach (var circle in circles)
             {
                 var circleName = circle.Name ?? "";
@@ -312,38 +316,38 @@ namespace ForestProtectionForce.Controllers
                         if (typeOfSelection == "financialyear")
                         {
                              prevValue = _context.Seizures_Form_A
-                            .Where(entry =>
-                                    (entry.year == previousYear && entry.month >= financialYearStartMonth) || // From April of the previous year
-                                    (entry.year == year+1 && entry.month <= currentMonth) // Up to the specified month of the current year
+                            .Where(entry => entry.name == item && entry.districtId == district.Id &&
+                                    ((entry.year == prePreviousYear && entry.month >= financialYearStartMonth) || // From April of the previous year
+                                    (entry.year == preCurrentYear && entry.month <= financialYearEndMonth)) // Up to the specified month of the current year
                                 )
-                            .Sum(entry =>  entry.total_independent);
+                            .Sum(entry =>  entry.during_month_independent);
 
                              durValue = _context.Seizures_Form_A
-                                .Where(entry =>
+                                .Where(entry => entry.name == item &&  entry.districtId == district.Id &&
                                         (entry.year == previousYear && entry.month >= financialYearStartMonth) || // From April of the previous year
-                                        (entry.year == year && entry.month == currentMonth) // Up to the specified month of the current year
+                                        (entry.year == currentYear && entry.month == financialYearEndMonth) // Up to the specified month of the current year
                                     )
-                                .Sum(entry =>  entry.total_independent);
+                                .Sum(entry =>  entry.during_month_independent);
                         }
                         else if (typeOfSelection == "calendaryear")
                         {
                             prevValue = _context.Seizures_Form_A
                            .Where(entry =>  entry.year < year && entry.name == item && entry.districtId == district.Id)
-                           .Sum(entry => entry.total_independent);
+                           .Sum(entry => entry.during_month_independent);
 
                             durValue = _context.Seizures_Form_A
                                .Where(entry =>  entry.year == year && entry.name == item && entry.districtId == district.Id)
-                               .Sum(entry => entry.total_independent);
+                               .Sum(entry => entry.during_month_independent);
                         }
                         else
                         {
                              prevValue = _context.Seizures_Form_A
                             .Where(entry => entry.month == month && entry.year == year && entry.name == item && entry.districtId == district.Id)
-                            .Sum(entry =>  entry.total_independent);
+                            .Sum(entry =>  entry.during_month_independent);
 
                              durValue = _context.Seizures_Form_A
                                 .Where(entry => entry.month == month && entry.year == year && entry.name == item && entry.districtId == district.Id)
-                                .Sum(entry =>  entry.total_independent);
+                                .Sum(entry =>  entry.during_month_independent);
                         }
                         
 
