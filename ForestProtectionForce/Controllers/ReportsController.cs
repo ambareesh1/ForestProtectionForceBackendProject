@@ -266,7 +266,7 @@ namespace ForestProtectionForce.Controllers
 
 
         [HttpGet("GetMonthCFFormReport")]
-        public async Task<ActionResult<IEnumerable<object>>> GetMonthCFFormReport(int districtId = 0, int month = 0, int year = 0, bool isFinancialYearSelected = false, string typeOfSelection = "month")
+        public ActionResult<IEnumerable<object>> GetMonthCFFormReport(int districtId = 0, int month = 0, int year = 0, bool isFinancialYearSelected = false, string typeOfSelection = "month")
         {
             List<AbstractMonth> abstractMonths = new List<AbstractMonth>
             {

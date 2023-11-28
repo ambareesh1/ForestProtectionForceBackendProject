@@ -379,14 +379,14 @@ namespace ForestProtectionForce.Controllers
         }
 
         [NonAction]
-        public seizure_man_animal_conflict ManAnimalConflict(int provinceId, int districtId, int month, int year)
+        public seizure_man_animal_conflict ManAnimalConflict(int provinceId, int districtId, int month, int year, string districtName)
         {
             seizure_man_animal_conflict seizure_Man_Animal_Conflict = new seizure_man_animal_conflict
             {
                 DistrictId = districtId,
                 ProvinceId = provinceId,
                 Id  = 0,
-                NameOfGammaUnit = "",
+                NameOfGammaUnit = districtName,
                 NoOfFPFPersonnelDeployed = 0,
                 PlaceOfOccurrence= "",
                 Remarks = "",
@@ -402,23 +402,25 @@ namespace ForestProtectionForce.Controllers
         }
 
         [NonAction]
-        public ForestFire FirestFireAdd(int provinceId, int districtId, int month, int year)
+        public ForestFire FirestFireAdd(int provinceId, int districtId, int month, int year, string districtName)
         {
-            ForestFire forestFire = new ()
+            ForestFire forestFire = new()
             {
                 district_id = districtId,
                 province_id = provinceId,
                 id = 0,
-                gamma_unit_name = "",
-               date_of_insertion = DateTime.Now,
-               fire_datetime = DateTime.Now,
-               fire_spot = "",
-               forest_crop_damaged ="",
-               forest_damage_area = 0.00m,
-               forest_division_name = "",
-               fpf_personnel_name = "",
-               ob_total_cases = 0,
-               total_fire_cases = 0,
+                gamma_unit_name = districtName,
+                date_of_insertion = DateTime.Now,
+                fire_datetime = DateTime.Now,
+                fire_spot = "",
+                forest_crop_damaged = "",
+                forest_damage_area = 0.00m,
+                forest_division_name = "",
+                fpf_personnel_name = "",
+                ob_total_cases = _context.forest_Fire
+                  .Where(x => x.month < month && x.year == year && x.district_id == districtId)
+                  .Count(),
+               total_fire_cases = 1,
                 is_active = true,
                 last_updated_on = DateTime.Now,
                 month = month,
@@ -947,7 +949,7 @@ namespace ForestProtectionForce.Controllers
                 return Problem("Entity set 'ForestProtectionForceContext.seizure_Man_Animal_Conflict'  is null.");
             }
 
-          seizure_man_animal_conflict manAnimalConflicts = ManAnimalConflict(seizure_Man_Animal_Conflicts.ProvinceId??0 , seizure_Man_Animal_Conflicts.DistrictId??0, seizure_Man_Animal_Conflicts.Month, seizure_Man_Animal_Conflicts.Year);
+          seizure_man_animal_conflict manAnimalConflicts = ManAnimalConflict(seizure_Man_Animal_Conflicts.ProvinceId??0 , seizure_Man_Animal_Conflicts.DistrictId??0, seizure_Man_Animal_Conflicts.Month, seizure_Man_Animal_Conflicts.Year, seizure_Man_Animal_Conflicts.NameOfGammaUnit);
             _context.seizure_man_animal_conflict.Add(manAnimalConflicts);
             await _context.SaveChangesAsync();
 
@@ -1015,7 +1017,7 @@ namespace ForestProtectionForce.Controllers
                 return Problem("Entity set 'ForestProtectionForceContext.ForestFire'  is null.");
             }
 
-            ForestFire forestFireData = FirestFireAdd(forestFire.province_id , forestFire.district_id, forestFire.month, forestFire.year);
+            ForestFire forestFireData = FirestFireAdd(forestFire.province_id , forestFire.district_id, forestFire.month, forestFire.year, forestFire.gamma_unit_name);
             _context.forest_Fire.Add(forestFireData);
             await _context.SaveChangesAsync();
            

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 
 using ForestProtectionForce.Services;
 using ForestProtectionForce.Middleware;
+using Microsoft.Extensions.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,15 +41,19 @@ builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
         .AddEntityFrameworkStores<ForestProtectionForceContext>()
         .AddDefaultTokenProviders();
 builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+
 builder.Services.Configure<EmailConfiguration>(builder.Configuration.GetSection("EmailConfiguration"));
 builder.Services.AddScoped<IEmailService, EmailService>();
 var app = builder.Build();
+app.UseMiddleware<ExceptionHandlerMiddleware>();
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
+   
+} 
+   app.UseSwagger();
     app.UseSwaggerUI();
-}
 //app.UseMiddleware<UserDataMiddleware>();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
