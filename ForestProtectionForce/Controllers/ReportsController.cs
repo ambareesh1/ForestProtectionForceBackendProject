@@ -26,11 +26,21 @@ namespace ForestProtectionForce.Controllers
 
         // GET: api/<ReportsController>
         [HttpGet("GetFormAReport")]
-        public async Task<ActionResult<IEnumerable<object>>> GetFormAReport(int districtId = 0, int month = 0, int year = 0, bool isJoint = true)
+        public async Task<ActionResult<IEnumerable<object>>> GetFormAReport(int districtId = 0, int month = 0, int year = 0, bool isJoint = true, int province = 0)
         {
-
             var itemNames = _context.Seizures_Form_A.Select(entry => entry.name).Distinct().ToList();
-            var districts = _context.District.Select(entry => entry.Id).Distinct().OrderByDescending(x=>x).ToList();
+            var districts = districtId == 0 ? _context.District.Select(entry => entry.Id).Distinct().OrderByDescending(x => x).ToList() :
+                _context.District.Where(x => x.Id == districtId).Select(entry => entry.Id).Distinct().OrderByDescending(x => x).ToList();
+            if (province!=0)
+            {
+                var circles = _context.Circle.Where(x => x.ProvinceId == province);
+                districts = _context.District
+                    .Where(d => circles.Any(c => c.Id == d.CircleId))
+                    .Select(entry => entry.Id)
+                    .Distinct()
+                    .OrderByDescending(x => x)
+                    .ToList();
+            }
             var result = new List<Dictionary<string, object>>();
 
             foreach (var item in itemNames)
@@ -41,10 +51,10 @@ namespace ForestProtectionForce.Controllers
                 foreach (var district in districts)
                 {
                      prevValue = isJoint ?  _context.Seizures_Form_A
-                        .Where(entry => (entry.month < month && entry.year == year) && entry.name == item && entry.districtId == district)
+                        .Where(entry => (entry.month <= month && entry.year == year) && entry.name == item && entry.districtId == district)
                         .Sum(entry =>  entry.during_month_joint) :
                          _context.Seizures_Form_A
-                        .Where(entry => (entry.month < month && entry.year == year) && entry.name == item && entry.districtId == district)
+                        .Where(entry => (entry.month <= month && entry.year == year) && entry.name == item && entry.districtId == district)
                         .Sum(entry => entry.during_month_independent);
 
                      durValue = isJoint ? _context.Seizures_Form_A
@@ -53,21 +63,21 @@ namespace ForestProtectionForce.Controllers
                         .Where(entry => entry.month == month && entry.name == item && entry.districtId == district)
                         .Sum(entry => entry.during_month_independent );
 
-                    if(districtId != 0)
-                    {
-                        prevValue = isJoint ? _context.Seizures_Form_A
-                       .Where(entry => (entry.month < month && entry.year == year) && entry.name == item && entry.districtId == districtId)
-                       .Sum(entry => entry.ob_joint) :
-                        _context.Seizures_Form_A
-                       .Where(entry => (entry.month < month && entry.year == year) && entry.name == item && entry.districtId == districtId)
-                       .Sum(entry => entry.ob_independent);
+                    //if(districtId != 0)
+                    //{
+                    //    prevValue = isJoint ? _context.Seizures_Form_A
+                    //   .Where(entry => (entry.month <= month && entry.year == year) && entry.name == item && entry.districtId == districtId)
+                    //   .Sum(entry => entry.ob_joint) :
+                    //    _context.Seizures_Form_A
+                    //   .Where(entry => (entry.month <= month && entry.year == year) && entry.name == item && entry.districtId == districtId)
+                    //   .Sum(entry => entry.ob_independent);
 
-                        durValue = isJoint ? _context.Seizures_Form_A
-                           .Where(entry => entry.month == month && entry.name == item && entry.districtId == districtId)
-                           .Sum(entry => entry.ob_joint) : _context.Seizures_Form_A
-                           .Where(entry => entry.month == month && entry.name == item && entry.districtId == districtId)
-                           .Sum(entry => entry.ob_independent);
-                    }
+                    //    durValue = isJoint ? _context.Seizures_Form_A
+                    //       .Where(entry => entry.month == month && entry.name == item && entry.districtId == districtId)
+                    //       .Sum(entry => entry.ob_joint) : _context.Seizures_Form_A
+                    //       .Where(entry => entry.month == month && entry.name == item && entry.districtId == districtId)
+                    //       .Sum(entry => entry.ob_independent);
+                    //}
 
                     decimal totalValue = prevValue + durValue;
 
@@ -89,7 +99,7 @@ namespace ForestProtectionForce.Controllers
         }
 
         [HttpGet("GetGammaUnitFormBReport")]
-        public async Task<ActionResult<IEnumerable<Gamma_unit_form_b>>> GetGammaUnitFormBReport(int districtId = 0, int month = 0, int year = 0)
+        public async Task<ActionResult<IEnumerable<Gamma_unit_form_b>>> GetGammaUnitFormBReport(int districtId = 0, int month = 0, int year = 0, int province = 0)
         {
             try
             {
@@ -102,6 +112,14 @@ namespace ForestProtectionForce.Controllers
                 {
                     return await _context.gamma_unit_form_b.Where(x => x.DistrictId == districtId && x.Month == month && x.Year == DateTime.Now.Year).ToListAsync();
                 }
+                if (province != 0)
+                {
+                    var circles = _context.Circle.Where(x => x.ProvinceId == province);
+                    var districts = _context.District
+                        .Where(d => circles.Any(c => c.Id == d.CircleId));
+                        
+                    return await _context.gamma_unit_form_b.Where(x => districts.Any(c => c.Id == x.DistrictId) && x.Month == month && x.Year == DateTime.Now.Year).ToListAsync();
+                }
                 return await _context.gamma_unit_form_b.Where(x => x.Month == month && x.Year == DateTime.Now.Year).ToListAsync();
             }
             catch (Exception ex)
@@ -111,7 +129,7 @@ namespace ForestProtectionForce.Controllers
         }
 
         [HttpGet("GetGammaUnitFormCReport")]
-        public async Task<ActionResult<IEnumerable<ReportC>>> GetGammaUnitFormCReport(int districtId = 0, int month = 0, int year = 0)
+        public async Task<ActionResult<IEnumerable<ReportC>>> GetGammaUnitFormCReport(int districtId = 0, int month = 0, int year = 0, int province = 0)
         {
             try
             {
@@ -122,10 +140,12 @@ namespace ForestProtectionForce.Controllers
                 month = month == 0 ? DateTime.Now.Month : month;
                 if (districtId != 0)
                 {
+                    var districts = _context.District
+                            .Where(d => d.Id ==districtId);
 
                     var result = await (
                          from status in _context.status_of_cases_form_c
-                         join district in _context.District on status.DistrictId equals district.Id
+                         join district in districts on status.DistrictId equals district.Id
                          where status.Month == month && status.Year == DateTime.Now.Year && status.Gamma_Unit == "Total"
                          select new ReportC
                          {
@@ -133,6 +153,25 @@ namespace ForestProtectionForce.Controllers
                              GammaUnit = district.Name
                          })
                          .ToListAsync();
+                    return result;
+                }
+                else if(province != 0)
+                {
+                   
+                        var circles = _context.Circle.Where(x => x.ProvinceId == province);
+                        var districts = _context.District
+                           .Where(d => circles.Any(c => c.Id == d.CircleId));
+                    
+                    var result = await (
+                                           from status in _context.status_of_cases_form_c
+                                           join district in districts on status.DistrictId equals district.Id
+                                           where status.Month == month && status.Year == DateTime.Now.Year && status.Gamma_Unit == "Total"
+                                           select new ReportC
+                                           {
+                                               seizure_CasesMonth_Form_Cs = status, // Assuming you have a List<Seizure_CasesMonth_Form_C> property in the status_of_cases_form_c entity
+                                               GammaUnit = district.Name
+                                           })
+                                           .ToListAsync();
                     return result;
                 }
                 else
@@ -159,7 +198,7 @@ namespace ForestProtectionForce.Controllers
         }
 
         [HttpPost("GetGammaUnitAbstractFormReport")]
-        public async Task<ActionResult<IEnumerable<AbstractMonth>>> GetGammaUnitAbstractFormReport([FromBody] RequestModel requestModel)
+        public async Task<ActionResult<IEnumerable<AbstractMonth>>> GetGammaUnitAbstractFormReport([FromBody] RequestModel requestModel, int province = 0)
         {
             try
             {
@@ -266,7 +305,7 @@ namespace ForestProtectionForce.Controllers
 
 
         [HttpGet("GetMonthCFFormReport")]
-        public ActionResult<IEnumerable<object>> GetMonthCFFormReport(int districtId = 0, int month = 0, int year = 0, bool isFinancialYearSelected = false, string typeOfSelection = "month")
+        public ActionResult<IEnumerable<object>> GetMonthCFFormReport(int districtId = 0, int month = 0, int year = 0, bool isFinancialYearSelected = false, string typeOfSelection = "month", int province = 0)
         {
             List<AbstractMonth> abstractMonths = new List<AbstractMonth>
             {
@@ -279,15 +318,29 @@ namespace ForestProtectionForce.Controllers
 
             var itemNames = abstractMonths.Select(x => x.Field).ToList();
 
-            var districts = _context.District
+            var districts = districtId == 0 ? _context.District
+               .Select(entry => new { entry.Id, entry.Name, entry.CircleId })
+               .Distinct()
+               .ToList(): _context.District.Where(x=>x.Id == districtId)
                .Select(entry => new { entry.Id, entry.Name, entry.CircleId })
                .Distinct()
                .ToList();
-            var circles = _context.Circle
+            var circles = districtId == 0 ? _context.Circle
+               .Select(entry => new { entry.Id, entry.Name })
+               .Distinct()
+               .ToList(): _context.Circle.Where(x=>x.Id == districts.FirstOrDefault().CircleId)
                .Select(entry => new { entry.Id, entry.Name })
                .Distinct()
                .ToList();
-        
+            if (province != 0)
+            {
+                var circlesf = _context.Circle.Where(x => x.ProvinceId == province);
+                districts = _context.District
+                    .Where(d => circlesf.Any(c => c.Id == d.CircleId))
+                   .Select(entry => new { entry.Id, entry.Name, entry.CircleId })
+               .Distinct()
+               .ToList();
+            }
 
             var result = new List<CircleData>();
             int currentMonth = DateTime.Now.Month;

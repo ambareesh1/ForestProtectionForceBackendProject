@@ -22,8 +22,8 @@
         public string? FIRNo { get; set; }
         public DateTime CrimeDate { get; set; }
         public string? SectionOfLaw { get; set; }
-        public int Quantity { get; set; }
-        public float Weight { get; set; }
+        public string? Quantity { get; set; }
+        public string? Weight { get; set; }
         public int NoOfAccused { get; set; }
         public string? NameOfAccused { get; set; }
         public string? SpeciesDetected { get; set; }
