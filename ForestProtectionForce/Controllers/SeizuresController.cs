@@ -136,7 +136,7 @@ namespace ForestProtectionForce.Controllers
                 return Problem("Entity set 'ForestProtectionForceContext.FormA'  is null.");
             }
 
-            List<Seizures_Form_A> seizures_Form_As = getSeizureReportA(seizures_Form_A.provinceId, seizures_Form_A.districtId,seizures_Form_A.month);
+            List<Seizures_Form_A> seizures_Form_As = getSeizureReportA(seizures_Form_A.provinceId, seizures_Form_A.districtId,seizures_Form_A.month, seizures_Form_A.year??0);
             _context.Seizures_Form_A.AddRange(seizures_Form_As);
             await _context.SaveChangesAsync();
 
@@ -269,7 +269,7 @@ namespace ForestProtectionForce.Controllers
         }
 
         [NonAction]
-        public Gamma_unit_form_b getSeizureGammaUnitB(int provinceId, int districtId, int month, int year)
+        public Gamma_unit_form_b getSeizureGammaUnitB(int provinceId, int districtId, int month, int year, string gammaUnit)
         {
             Gamma_unit_form_b formB = new Gamma_unit_form_b
             {
@@ -282,7 +282,7 @@ namespace ForestProtectionForce.Controllers
                 LastUpdatedOn = DateTime.Now,
                 Month = month,
                 Year = year,
-                Gamma_Unit = "",
+                Gamma_Unit = gammaUnit,
                 JOP_Reports_Received = 0,
                 Jungle_Gashts_Performed = 0,
                 Nakas_Laid = 0,
@@ -838,7 +838,7 @@ namespace ForestProtectionForce.Controllers
                 return Problem("Entity set 'ForestProtectionForceContext.PostGammaUnitFormB'  is null.");
             }
 
-            Gamma_unit_form_b formB = getSeizureGammaUnitB(seizures_GammaUnit_Form_B.ProvinceId, seizures_GammaUnit_Form_B.DistrictId, seizures_GammaUnit_Form_B.Month, seizures_GammaUnit_Form_B.Year);
+            Gamma_unit_form_b formB = getSeizureGammaUnitB(seizures_GammaUnit_Form_B.ProvinceId, seizures_GammaUnit_Form_B.DistrictId, seizures_GammaUnit_Form_B.Month, seizures_GammaUnit_Form_B.Year, seizures_GammaUnit_Form_B.Gamma_Unit);
             _context.gamma_unit_form_b.Add(formB);
             await _context.SaveChangesAsync();
 
