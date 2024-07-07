@@ -16,10 +16,10 @@ namespace ForestProtectionForce.utilities
         {
              if(userData.username == "superadmin_jammu")
             {
-                return 1;
+                return 2;
             }else if (userData.username == "superadmin_kashmir")
             {
-                return 2;
+                return 1;
             }
             else
             {
