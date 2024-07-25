@@ -60,7 +60,7 @@ namespace ForestProtectionForce.Controllers
                 }
                 month = month == 0 ? DateTime.Now.Month : month;
                 year = year == 0 ? DateTime.Now.Year : year;
-                var data = await _context.Seizures_Form_A.Where(x => x.districtId == id && x.month == month).ToListAsync();
+                var data = await _context.Seizures_Form_A.Where(x => x.districtId == id && x.month == month && x.year == year).ToListAsync();
                 var formA_names = FormA_names();
                 foreach (var item in formA_names)
                 {
